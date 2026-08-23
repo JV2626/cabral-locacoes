@@ -235,7 +235,7 @@ export const App: React.FC = () => {
   const isLight = settings.theme === 'light';
 
   return (
-    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${
+    <div className={`min-h-screen font-sans antialiased ${
       isLight ? 'bg-slate-100 text-slate-900 selection:bg-brand-500 selection:text-white' : 'bg-slate-950 text-slate-100 selection:bg-brand-500 selection:text-white'
     }`}>
       {/* Top Navigation */}
@@ -255,7 +255,7 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content View */}
-      <main className="transition-all">
+      <main>
         {activeTab === 'public' && (
           <PublicLandingPage
             onOpenContactHub={() => setIsContactHubOpen(true)}

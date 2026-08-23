@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { mockVehicles } from '../lib/mock-data';
 import { formatCurrency } from '../lib/utils/calculations';
 import { BrandLogo } from './BrandLogo';
@@ -34,7 +34,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   const [isFading, setIsFading] = useState(false);
   const isLight = theme === 'light';
 
-  const brandOptions = [
+  const brandOptions = useMemo(() => [
     {
       id: 'both',
       node: (
@@ -81,7 +81,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
         </span>
       )
     }
-  ];
+  ], [isLight]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -89,19 +89,24 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
       setTimeout(() => {
         setBrandIndex((prev) => (prev + 1) % brandOptions.length);
         setIsFading(false);
-      }, 400);
+      }, 350);
     }, 4500);
     return () => clearInterval(timer);
   }, [brandOptions.length]);
 
-  const filteredCars = mockVehicles.filter(v => 
-    selectedCategory === 'all' || v.category === selectedCategory
-  );
+  const filteredCars = useMemo(() => {
+    return mockVehicles.filter(v => 
+      selectedCategory === 'all' || v.category === selectedCategory
+    );
+  }, [selectedCategory]);
 
-  // Estimator logic
-  const weeklyRentalCost = simulatorCarType === 'sedan' ? 560 : 490;
-  const estimatedMonthlyGross = simulatorHours * 38 * 26; // R$ 38/h * 26 dias
-  const estimatedMonthlyNet = estimatedMonthlyGross - (weeklyRentalCost * 4.2) - (simulatorHours * 16 * 26);
+  // Estimator logic memoized for 60fps slider performance
+  const { weeklyRentalCost, estimatedMonthlyGross, estimatedMonthlyNet } = useMemo(() => {
+    const weeklyCost = simulatorCarType === 'sedan' ? 560 : 490;
+    const gross = simulatorHours * 38 * 26; // R$ 38/h * 26 dias
+    const net = gross - (weeklyCost * 4.2) - (simulatorHours * 16 * 26);
+    return { weeklyRentalCost: weeklyCost, estimatedMonthlyGross: gross, estimatedMonthlyNet: net };
+  }, [simulatorCarType, simulatorHours]);
 
   return (
     <div className={`min-h-screen font-sans selection:bg-brand-500 selection:text-white transition-colors ${
@@ -350,7 +355,13 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             >
               <div>
                 <div className={`h-48 relative overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-950'}`}>
-                  <img src={car.photoUrl} alt={car.model} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <img
+                    src={car.photoUrl}
+                    alt={car.model}
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
                   <span className={`absolute top-3 right-3 backdrop-blur-md text-[10px] font-black px-3 py-1 rounded-full border ${
                     isLight 
                       ? 'bg-white/90 text-blue-700 border-blue-200' 
