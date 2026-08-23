@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { mockVehicles } from '../lib/mock-data';
 import { formatCurrency } from '../lib/utils/calculations';
 import { BrandLogo } from './BrandLogo';
@@ -26,6 +26,58 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'Hatch' | 'Sedan' | 'SUV'>('all');
   const [simulatorHours, setSimulatorHours] = useState(8);
   const [simulatorCarType, setSimulatorCarType] = useState('sedan');
+  
+  // Smooth subtle brand transition (without harsh background container)
+  const [brandIndex, setBrandIndex] = useState(0);
+  const [isFading, setIsFading] = useState(false);
+
+  const brandOptions = [
+    {
+      id: 'both',
+      node: (
+        <span className="inline-flex items-center align-middle gap-2 mx-1.5">
+          <span className="inline-flex items-center px-3 py-0.5 sm:px-3.5 sm:py-1 bg-black text-white text-base sm:text-2xl font-black rounded-xl border border-slate-700/80 shadow-md font-sans">
+            Uber
+          </span>
+          <span className="text-slate-400 font-extrabold text-sm sm:text-lg">&</span>
+          <span className="inline-flex items-center px-3 py-0.5 sm:px-3.5 sm:py-1 bg-[#FFCC00] text-black text-base sm:text-2xl font-black rounded-xl shadow-md font-sans">
+            99
+          </span>
+        </span>
+      )
+    },
+    {
+      id: 'uber',
+      node: (
+        <span className="inline-flex items-center align-middle mx-1.5">
+          <span className="inline-flex items-center px-4 py-0.5 sm:px-5 sm:py-1 bg-black text-white text-base sm:text-2xl font-black rounded-xl border border-slate-700/80 shadow-md font-sans">
+            Uber
+          </span>
+        </span>
+      )
+    },
+    {
+      id: '99',
+      node: (
+        <span className="inline-flex items-center align-middle mx-1.5">
+          <span className="inline-flex items-center px-4 py-0.5 sm:px-5 sm:py-1 bg-[#FFCC00] text-black text-base sm:text-2xl font-black rounded-xl shadow-md font-sans">
+            99 App
+          </span>
+        </span>
+      )
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIsFading(true);
+      setTimeout(() => {
+        setBrandIndex((prev) => (prev + 1) % brandOptions.length);
+        setIsFading(false);
+      }, 250);
+    }, 3200);
+    return () => clearInterval(timer);
+  }, [brandOptions.length]);
 
   const filteredCars = mockVehicles.filter(v => 
     selectedCategory === 'all' || v.category === selectedCategory
@@ -59,18 +111,11 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
               <span>Locação Especializada para Motoristas de App</span>
             </div>
 
-            {/* Main Headline with Animated Uber & 99 Badges */}
+            {/* Main Headline with Clean & Smoothly Animated Logos */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight font-display">
               Alugue seu carro para rodar na{' '}
-              <span className="animate-badge-glow inline-flex items-center align-middle gap-1.5 sm:gap-2.5 bg-slate-900/95 border border-slate-700/80 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-2xl shadow-2xl mx-1.5 my-1.5 hover:scale-105 transition-all cursor-default">
-                <span className="animate-uber-pulse bg-black text-white text-xs sm:text-base font-black px-3 py-1 rounded-xl flex items-center gap-1.5 border border-slate-800 tracking-wider shadow-inner font-sans">
-                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-brand-cyan animate-ping"></span>
-                  Uber
-                </span>
-                <span className="text-slate-500 font-extrabold text-xs sm:text-sm">&</span>
-                <span className="animate-99-pulse bg-[#FFCC00] text-black text-xs sm:text-base font-black px-3 py-1 rounded-xl flex items-center tracking-tight shadow-md font-sans">
-                  99
-                </span>
+              <span className={`inline-block transition-all duration-300 ease-in-out ${isFading ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0'}`}>
+                {brandOptions[brandIndex].node}
               </span>{' '}
               sem burocracia
             </h1>
