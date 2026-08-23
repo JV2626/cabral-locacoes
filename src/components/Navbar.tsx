@@ -45,83 +45,85 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-slate-800 text-white shadow-xl">
+    <header className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-slate-800 text-white shadow-xl transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4">
           
           {/* Brand Official Logo */}
-          <BrandLogo size="md" onClick={() => setActiveTab('public')} />
+          <div className="shrink-0">
+            <BrandLogo size="md" onClick={() => setActiveTab('public')} />
+          </div>
 
-          {/* Center Navigation Tabs */}
-          <nav className="hidden lg:flex items-center space-x-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
+          {/* Center Navigation Tabs (Concise & Spacious) */}
+          <nav className="hidden lg:flex items-center space-x-1 bg-slate-900/90 p-1 rounded-2xl border border-slate-800 shadow-inner">
             <button
               onClick={() => setActiveTab('public')}
-              className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'public'
-                  ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/25 font-black'
+                  ? 'bg-brand-500 text-white shadow-md font-black'
                   : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
               }`}
             >
-              <GlobeIcon className="w-4 h-4" />
-              <span>Site da Marca</span>
+              <GlobeIcon className="w-3.5 h-3.5" />
+              <span>Site</span>
             </button>
 
             {userRole === 'admin' && isAdminAuthenticated ? (
               <>
                 <button
                   onClick={() => setActiveTab('dashboard')}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'dashboard'
-                      ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/25 font-black'
+                      ? 'bg-brand-500 text-white shadow-md font-black'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
-                  <ChartIcon className="w-4 h-4" />
+                  <ChartIcon className="w-3.5 h-3.5" />
                   <span>10 KPIs</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('locacoes')}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'locacoes'
-                      ? 'bg-brand-cyan text-slate-950 shadow-lg shadow-brand-cyan/20 font-black'
+                      ? 'bg-brand-cyan text-slate-950 shadow-md font-black'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
-                  <KeyIcon className="w-4 h-4" />
-                  <span>Locações & Contratos</span>
+                  <KeyIcon className="w-3.5 h-3.5" />
+                  <span>Locações</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('frota')}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'frota'
-                      ? 'bg-slate-700 text-white shadow-lg font-black'
+                      ? 'bg-slate-700 text-white shadow-md font-black'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
-                  <CarIcon className="w-4 h-4" />
+                  <CarIcon className="w-3.5 h-3.5" />
                   <span>Frota</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('manutencao')}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'manutencao'
-                      ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 font-black'
+                      ? 'bg-amber-500 text-slate-950 shadow-md font-black'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
-                  <WrenchIcon className="w-4 h-4" />
-                  <span>Manutenção por KM</span>
+                  <WrenchIcon className="w-3.5 h-3.5" />
+                  <span>Manutenção</span>
                 </button>
                 <button
                   onClick={() => setActiveTab('insights')}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'insights'
-                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 font-black'
+                      ? 'bg-purple-600 text-white shadow-md font-black'
                       : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
-                  <SparklesIcon className="w-4 h-4" />
-                  <span>Insights IA</span>
+                  <SparklesIcon className="w-3.5 h-3.5" />
+                  <span>Insights</span>
                 </button>
               </>
             ) : (
@@ -133,9 +135,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                     onOpenAuthModal('driver');
                   }
                 }}
-                className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center space-x-2 px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'motorista'
-                    ? 'bg-brand-cyan text-slate-950 shadow-lg shadow-brand-cyan/20 font-black'
+                    ? 'bg-brand-cyan text-slate-950 shadow-md font-black'
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
               >
@@ -145,74 +147,80 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </nav>
 
-          {/* Right Action Controls: Theme Toggle, Settings, Profile, WhatsApp */}
-          <div className="flex items-center space-x-2 sm:space-x-3">
+          {/* Right Action Controls: Toolbar, Profile & WhatsApp */}
+          <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
             
-            {/* Quick Theme Toggle (Light / Dark) */}
-            <button
-              onClick={onToggleTheme}
-              className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
-              title={`Alternar para tema ${theme === 'dark' ? 'Claro' : 'Escuro'}`}
-            >
-              <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
-            </button>
+            {/* Action Tools Cluster (Theme, Settings, Bell) */}
+            <div className="flex items-center space-x-1 bg-slate-900/90 p-1 rounded-2xl border border-slate-800">
+              {/* Quick Theme Toggle (Light / Dark) */}
+              <button
+                onClick={onToggleTheme}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
+                title={`Alternar para tema ${theme === 'dark' ? 'Claro' : 'Escuro'}`}
+              >
+                <span className="text-sm">{theme === 'dark' ? '☀️' : '🌙'}</span>
+              </button>
 
-            {/* Settings Gear */}
-            <button
-              onClick={onOpenSettings}
-              className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
-              title="Configurações & Permissões"
-            >
-              <span>⚙️</span>
-            </button>
-            
-            {/* Notification Bell (for logged Admin) */}
-            {isAdminAuthenticated && userRole === 'admin' && (
-              <div className="relative">
-                <button
-                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white transition-all relative cursor-pointer"
-                  title="Central de Notificações"
-                >
-                  <BellIcon className="w-5 h-5" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
-                    3
-                  </span>
-                </button>
+              {/* Settings Gear */}
+              <button
+                onClick={onOpenSettings}
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
+                title="Configurações & Permissões"
+              >
+                <span className="text-sm">⚙️</span>
+              </button>
+              
+              {/* Notification Bell (for logged Admin) */}
+              {isAdminAuthenticated && userRole === 'admin' && (
+                <div className="relative">
+                  <button
+                    onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl hover:bg-slate-800 flex items-center justify-center text-slate-300 hover:text-white transition-all relative cursor-pointer"
+                    title="Central de Notificações"
+                  >
+                    <BellIcon className="w-4 h-4" />
+                    <span className="absolute 1 top-1 right-1 w-3.5 h-3.5 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center animate-pulse">
+                      3
+                    </span>
+                  </button>
 
-                <NotificationsDropdown
-                  isOpen={isNotificationsOpen}
-                  onClose={() => setIsNotificationsOpen(false)}
-                  onNavigateTab={(tab) => {
-                    setActiveTab(tab);
-                    setIsNotificationsOpen(false);
-                  }}
-                />
-              </div>
-            )}
+                  <NotificationsDropdown
+                    isOpen={isNotificationsOpen}
+                    onClose={() => setIsNotificationsOpen(false)}
+                    onNavigateTab={(tab) => {
+                      setActiveTab(tab);
+                      setIsNotificationsOpen(false);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Separator */}
+            <div className="hidden sm:block h-6 w-px bg-slate-800" />
 
             {/* Authentication / Profile Status Button */}
             {isAdminAuthenticated && userRole === 'admin' ? (
-              <div className="flex items-center space-x-2 bg-slate-900 border border-brand-500/40 px-3 py-2 rounded-xl text-xs">
+              <div className="flex items-center space-x-2 bg-slate-900 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs">
                 <span className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
-                <span className="font-bold text-white hidden sm:inline">👑 Admin Ativo</span>
+                <span className="font-bold text-white hidden md:inline">👑 Diretoria</span>
                 <button
                   onClick={onLogout}
-                  className="text-[10px] bg-slate-800 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 px-2 py-0.5 rounded-md transition-colors font-bold ml-1 cursor-pointer"
+                  className="text-[10px] bg-slate-800 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 px-2 py-0.5 rounded-md transition-colors font-bold cursor-pointer"
                   title="Sair da conta"
                 >
                   Sair
                 </button>
               </div>
             ) : isDriverAuthenticated && userRole === 'driver' ? (
-              <div className="flex items-center space-x-2 bg-slate-900 border border-brand-cyan/40 px-3 py-2 rounded-xl text-xs">
+              <div className="flex items-center space-x-2 bg-slate-900 border border-brand-cyan/40 px-3 py-1.5 rounded-xl text-xs">
                 <span className="w-2 h-2 rounded-full bg-brand-cyan"></span>
-                <span className="font-bold text-brand-cyan truncate max-w-[100px] sm:max-w-[150px]">
+                <span className="font-bold text-brand-cyan truncate max-w-[90px] sm:max-w-[120px]">
                   {userProfile?.name || 'Motorista'}
                 </span>
                 <button
                   onClick={onLogout}
-                  className="text-[10px] bg-slate-800 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 px-2 py-0.5 rounded-md transition-colors font-bold ml-1 cursor-pointer"
+                  className="text-[10px] bg-slate-800 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 px-2 py-0.5 rounded-md transition-colors font-bold cursor-pointer"
                   title="Sair da conta"
                 >
                   Sair
@@ -221,18 +229,19 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => onOpenAuthModal('driver')}
-                className="flex items-center space-x-2 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-3.5 py-2.5 rounded-xl font-black text-xs transition-all shadow-md shadow-brand-500/25 active:scale-95 cursor-pointer"
+                className="flex items-center space-x-2 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-3.5 py-2 rounded-xl font-black text-xs transition-all shadow-md shadow-brand-500/25 active:scale-95 cursor-pointer"
               >
                 <KeyIcon className="w-3.5 h-3.5" />
-                <span>Entrar / Cadastrar</span>
+                <span className="hidden sm:inline">Entrar / Cadastrar</span>
+                <span className="sm:hidden">Entrar</span>
               </button>
             )}
 
             {/* Official WhatsApp Button */}
             <button
               onClick={onOpenContactHub}
-              className="flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-4 py-2.5 rounded-xl font-black text-xs transition-all shadow-lg shadow-[#25D366]/25 active:scale-95 cursor-pointer"
-              title="Falar no WhatsApp"
+              className="flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3.5 py-2 rounded-xl font-black text-xs transition-all shadow-md shadow-[#25D366]/25 active:scale-95 cursor-pointer shrink-0"
+              title="Falar no WhatsApp Oficial"
             >
               <WhatsAppIcon className="w-4 h-4 fill-white" />
               <span className="hidden sm:inline">WhatsApp</span>

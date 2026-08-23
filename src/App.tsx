@@ -74,6 +74,17 @@ export const App: React.FC = () => {
     }
   }, []);
 
+  // Sync theme with HTML root class
+  useEffect(() => {
+    if (settings.theme === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+    } else {
+      document.documentElement.classList.remove('light');
+      document.documentElement.classList.add('dark');
+    }
+  }, [settings.theme]);
+
   const handleOpenAuth = (role: 'admin' | 'driver' = 'driver') => {
     setAuthModalInitialRole(role);
     setIsAuthModalOpen(true);
