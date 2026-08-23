@@ -38,10 +38,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
       {showText && (
         <div className="flex flex-col">
-          <span className={`${current.title} font-black italic tracking-wider bg-gradient-to-r from-white via-slate-100 to-brand-300 bg-clip-text text-transparent leading-none drop-shadow-sm font-display uppercase`}>
+          <span className={`${current.title} font-black italic tracking-wider text-slate-950 dark:text-white leading-none font-display uppercase`}>
             CABRAL
           </span>
-          <span className={`${current.sub} font-black tracking-[0.25em] text-brand-cyan uppercase leading-tight mt-0.5`}>
+          <span className={`${current.sub} font-black tracking-[0.25em] text-blue-700 dark:text-brand-cyan uppercase leading-tight mt-0.5`}>
             — LOCAÇÕES —
           </span>
         </div>
