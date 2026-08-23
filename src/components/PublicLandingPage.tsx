@@ -105,14 +105,14 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
 
   return (
     <div className={`min-h-screen font-sans selection:bg-brand-500 selection:text-white transition-colors ${
-      isLight ? 'bg-slate-50 text-slate-900' : 'bg-brand-dark text-slate-100'
+      isLight ? 'bg-slate-50 text-slate-900' : 'bg-[#030A17] text-slate-100'
     }`}>
       
       {/* Hero Section */}
       <section className={`relative overflow-hidden pt-12 pb-24 border-b ${
         isLight 
           ? 'bg-slate-50 border-slate-200' 
-          : 'bg-radial from-brand-900/60 via-brand-dark to-brand-dark border-slate-800'
+          : 'bg-gradient-to-b from-[#061329] via-[#050D1A] to-[#030A17] border-slate-800'
       }`}>
         
         {/* Glow ambient background effects */}
@@ -124,7 +124,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             
             {/* Center Brand Badge */}
             <div className="flex justify-center mb-2">
-              <BrandLogo size="lg" />
+              <BrandLogo size="lg" theme={theme} />
             </div>
 
             <div className={`inline-flex items-center space-x-2 px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase border ${
@@ -488,7 +488,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
         isLight ? 'bg-slate-100 border-slate-200 text-slate-600' : 'bg-brand-dark border-slate-800 text-slate-400'
       }`}>
         <div className="flex justify-center">
-          <BrandLogo size="md" />
+          <BrandLogo size="md" theme={theme} />
         </div>
         <p className={`font-extrabold ${isLight ? 'text-slate-900' : 'text-slate-200'}`}>CABRAL LOCAÇÕES DE VEÍCULOS LTDA</p>
         <p className={`max-w-md mx-auto ${isLight ? 'text-slate-600' : 'text-slate-400'}`}>

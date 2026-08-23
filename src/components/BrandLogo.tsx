@@ -5,13 +5,15 @@ interface BrandLogoProps {
   showText?: boolean;
   className?: string;
   onClick?: () => void;
+  theme?: 'dark' | 'light';
 }
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
   showText = true,
   className = '',
-  onClick
+  onClick,
+  theme
 }) => {
   const sizeMap = {
     sm: { img: 'w-8 h-8', title: 'text-sm', sub: 'text-[9px]' },
@@ -21,6 +23,13 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   };
 
   const current = sizeMap[size];
+  const isLight = theme === 'light';
+  const titleClass = theme 
+    ? (isLight ? 'text-slate-950' : 'text-white') 
+    : 'text-slate-950 dark:text-white';
+  const subClass = theme 
+    ? (isLight ? 'text-blue-700' : 'text-brand-cyan') 
+    : 'text-blue-700 dark:text-brand-cyan';
 
   return (
     <div
@@ -38,10 +47,10 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 
       {showText && (
         <div className="flex flex-col">
-          <span className={`${current.title} font-black italic tracking-wider text-slate-950 dark:text-white leading-none font-display uppercase`}>
+          <span className={`${current.title} font-black italic tracking-wider leading-none font-display uppercase ${titleClass}`}>
             CABRAL
           </span>
-          <span className={`${current.sub} font-black tracking-[0.25em] text-blue-700 dark:text-brand-cyan uppercase leading-tight mt-0.5`}>
+          <span className={`${current.sub} font-black tracking-[0.25em] uppercase leading-tight mt-0.5 ${subClass}`}>
             — LOCAÇÕES —
           </span>
         </div>
