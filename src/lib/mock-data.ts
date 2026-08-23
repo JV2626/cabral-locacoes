@@ -1,4 +1,4 @@
-import { Vehicle, MaintenanceRule, Contract, KpiMetrics, AiInsight, QuotedPartItem, TrafficFine, DriverScore } from '../types/fleet';
+import { Vehicle, MaintenanceRule, Contract, KpiMetrics, AiInsight, QuotedPartItem, TrafficFine, DriverScore, PastRental, AppSettings } from '../types/fleet';
 
 export const mockVehicles: Vehicle[] = [
   {
@@ -423,4 +423,54 @@ export const mockDriverScores: DriverScore[] = [
     depositDiscountPercent: 0
   }
 ];
+
+export const mockPastRentals: PastRental[] = [
+  {
+    id: 'past-1',
+    vehiclePlate: 'XYZ-9876',
+    vehicleModel: 'Chevrolet Onix Plus 1.0 LT',
+    driverName: 'Rodrigo Mendonça',
+    driverPhone: '(11) 98712-3456',
+    driverCnh: '02938475610',
+    startDate: '10/01/2024',
+    endDate: '15/06/2024',
+    totalWeeks: 22,
+    totalPaid: 12980,
+    depositAmount: 800,
+    depositStatus: 'refunded',
+    startKm: 12000,
+    endKm: 28400,
+    totalKmDriven: 16400,
+    conditionNotes: 'Carro devolvido com polimento e sem amassados. Caução estornada no PIX.'
+  },
+  {
+    id: 'past-2',
+    vehiclePlate: 'QWE-4321',
+    vehicleModel: 'Fiat Cronos 1.3 Drive',
+    driverName: 'Juliana Castro',
+    driverPhone: '(11) 97412-8923',
+    driverCnh: '05928174629',
+    startDate: '05/03/2024',
+    endDate: '20/07/2024',
+    totalWeeks: 19,
+    totalPaid: 10640,
+    depositAmount: 800,
+    depositStatus: 'refunded',
+    startKm: 24500,
+    endKm: 42150,
+    totalKmDriven: 17650,
+    conditionNotes: 'Revisões de 30k e 40k feitas em dia. Pneus em bom estado.'
+  }
+];
+
+export const defaultAppSettings: AppSettings = {
+  theme: 'dark',
+  notificationsEnabled: false,
+  cameraPermissionGranted: false,
+  companyName: 'Cabral Locações de Veículos LTDA',
+  pixKey: 'financeiro@cabrallocacoes.com.br',
+  whatsappPhone: '+55 (11) 98288-6032',
+  defaultDepositAmount: 800
+};
+
 

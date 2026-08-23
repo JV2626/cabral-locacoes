@@ -3,13 +3,18 @@ import { mockVehicles, mockContracts } from '../lib/mock-data';
 import { formatCurrency, formatKm, calculateRemainingKm } from '../lib/utils/calculations';
 import { analyzeDashboardImage, OcrResult } from '../lib/utils/ocrService';
 import { updateVehicleOdometer } from '../lib/supabase';
+import { sendPushNotification } from '../lib/notifications';
 import { BrandLogo } from './BrandLogo';
 
 interface DriverPortalProps {
   onOpenContactHub: () => void;
+  onUpdateOdometer?: (plate: string, newKm: number) => void;
 }
 
-export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) => {
+export const DriverPortal: React.FC<DriverPortalProps> = ({
+  onOpenContactHub,
+  onUpdateOdometer
+}) => {
   const [isAuthenticated, setIsAuthenticated] = useState(true); // Default true if accessed via portal tab
   const [phoneOrCnh, setPhoneOrCnh] = useState('');
   const [smsCode, setSmsCode] = useState('');
@@ -56,7 +61,19 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
       setOcrResult(result);
       setDriverKm(result.extractedKm);
       await updateVehicleOdometer(currentVehicle.plate, result.extractedKm);
-      setSuccessToast(`Odômetro lido com sucesso: ${formatKm(result.extractedKm)} (${result.confidence}% de precisão da IA)`);
+      
+      // Sincroniza em tempo real com todos os 10 KPIs e regras de manutenção da Cabral Locações
+      if (onUpdateOdometer) {
+        onUpdateOdometer(currentVehicle.plate, result.extractedKm);
+      }
+
+      // Dispara notificação nativa no celular / desktop
+      sendPushNotification(
+        '🚗 Odômetro Atualizado em Tempo Real!',
+        `Veículo ${currentVehicle.plate} atualizado para ${formatKm(result.extractedKm)}. KPIs sincronizados!`
+      );
+
+      setSuccessToast(`Odômetro sincronizado com sucesso: ${formatKm(result.extractedKm)} (${result.confidence}% de precisão IA)`);
       setTimeout(() => setSuccessToast(null), 5000);
     } catch {
       setErrorMsg('Falha ao analisar a foto do painel. Tente novamente com mais iluminação.');
@@ -253,6 +270,7 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
           <input
             type="file"
             accept="image/*"
+            capture="environment"
             ref={fileInputRef}
             onChange={handlePhotoSelect}
             className="hidden"
@@ -263,9 +281,9 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
               onClick={() => fileInputRef.current?.click()}
               className="border-2 border-dashed border-slate-800 hover:border-brand-500 p-5 rounded-2xl text-center space-y-2 cursor-pointer transition-colors bg-slate-950/60"
             >
-              <span className="text-2xl block">📷</span>
-              <span className="text-xs font-bold text-slate-200 block">Tirar foto do Odômetro ou Escolher Arquivo</span>
-              <span className="text-[10px] text-slate-400 block">A IA lê o KM automaticamente</span>
+              <span className="text-2xl block">📸</span>
+              <span className="text-xs font-bold text-slate-200 block">Tirar Foto com a Câmera ou Escolher da Galeria</span>
+              <span className="text-[10px] text-slate-400 block">A IA Gemini detecta o KM automaticamente</span>
             </div>
           ) : (
             <div className="space-y-3">

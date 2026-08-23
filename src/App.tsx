@@ -5,12 +5,33 @@ import { DashboardOverview } from './components/DashboardOverview';
 import { MaintenanceDashboard } from './components/MaintenanceDashboard';
 import { AiCopilotAndInsights } from './components/AiCopilotAndInsights';
 import { FleetTableWithExport } from './components/FleetTableWithExport';
+import { RentalManagement } from './components/RentalManagement';
+import { AddVehicleModal } from './components/AddVehicleModal';
+import { SettingsModal } from './components/SettingsModal';
 import { DriverPortal } from './components/DriverPortal';
 import { ContactHubModal } from './components/ContactHubModal';
 import { AuthModal, UserProfile } from './components/AuthModal';
 
+import {
+  Vehicle,
+  Contract,
+  PastRental,
+  MaintenanceRule,
+  AppSettings,
+  ThemeMode
+} from './types/fleet';
+import {
+  mockVehicles,
+  mockContracts,
+  mockPastRentals,
+  mockMaintenanceRules,
+  defaultAppSettings
+} from './lib/mock-data';
+import { calculateRemainingKm } from './lib/utils/calculations';
+import { sendPushNotification } from './lib/notifications';
+
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista'>('public');
+  const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista'>('public');
   const [userRole, setUserRole] = useState<'admin' | 'driver'>('driver');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
@@ -20,8 +41,17 @@ export const App: React.FC = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalInitialRole, setAuthModalInitialRole] = useState<'admin' | 'driver'>('driver');
   const [isContactHubOpen, setIsContactHubOpen] = useState(false);
+  const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Load saved profile from localStorage
+  // Global State for Vehicles, Contracts, Past Rentals, Maintenance Rules and Settings
+  const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
+  const [contracts, setContracts] = useState<Contract[]>(mockContracts);
+  const [pastRentals, setPastRentals] = useState<PastRental[]>(mockPastRentals);
+  const [maintenanceRules, setMaintenanceRules] = useState<MaintenanceRule[]>(mockMaintenanceRules);
+  const [settings, setSettings] = useState<AppSettings>(defaultAppSettings);
+
+  // Load saved profile & settings from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem('cabral_user_profile');
@@ -33,6 +63,11 @@ export const App: React.FC = () => {
         } else {
           setIsDriverAuthenticated(true);
         }
+      }
+
+      const savedSettings = localStorage.getItem('cabral_settings');
+      if (savedSettings) {
+        setSettings(JSON.parse(savedSettings));
       }
     } catch {
       // ignore
@@ -76,8 +111,122 @@ export const App: React.FC = () => {
     }
   };
 
+  // Add new vehicle to fleet & inventory
+  const handleAddVehicle = (newVehicle: Vehicle) => {
+    setVehicles(prev => [newVehicle, ...prev]);
+    sendPushNotification(
+      '🚗 Novo Carro Cadastrado!',
+      `${newVehicle.model} (${newVehicle.plate}) foi adicionado ao estoque da Cabral Locações.`
+    );
+  };
+
+  // Add new contract (starts a rental)
+  const handleAddContract = (newContract: Contract) => {
+    setContracts(prev => [newContract, ...prev]);
+    // Mark vehicle as rented
+    setVehicles(prev => prev.map(v => 
+      v.id === newContract.vehicleId || v.plate === newContract.vehiclePlate 
+        ? { ...v, status: 'rented', currentDriver: newContract.driverName } 
+        : v
+    ));
+    sendPushNotification(
+      '🔑 Nova Locação Confirmada!',
+      `Carro ${newContract.vehicleModel} entregue para o motorista ${newContract.driverName}.`
+    );
+  };
+
+  // End contract (returns car, refunds deposit, adds to past rentals)
+  const handleEndRental = (contractId: string, endKm: number, notes: string) => {
+    const contract = contracts.find(c => c.id === contractId);
+    if (!contract) return;
+
+    const vehicle = vehicles.find(v => v.plate === contract.vehiclePlate);
+    const startKm = vehicle ? Math.max(0, endKm - (contract.weeksRented * 1200)) : 0;
+    const totalKmDriven = endKm - startKm;
+
+    const newPast: PastRental = {
+      id: `past-${Date.now()}`,
+      vehiclePlate: contract.vehiclePlate,
+      vehicleModel: contract.vehicleModel,
+      driverName: contract.driverName,
+      driverPhone: contract.driverPhone,
+      driverCnh: contract.driverCnh,
+      startDate: new Date(Date.now() - contract.weeksRented * 7 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
+      endDate: new Date().toLocaleDateString('pt-BR'),
+      totalWeeks: contract.weeksRented,
+      totalPaid: contract.rate * contract.weeksRented,
+      depositAmount: contract.depositAmount || 800,
+      depositStatus: 'refunded',
+      startKm,
+      endKm,
+      totalKmDriven,
+      conditionNotes: notes
+    };
+
+    setPastRentals(prev => [newPast, ...prev]);
+    setContracts(prev => prev.filter(c => c.id !== contractId));
+    
+    // Free the vehicle and update its KM
+    setVehicles(prev => prev.map(v => 
+      v.plate === contract.vehiclePlate 
+        ? { ...v, status: 'available', currentKm: endKm, currentDriver: undefined } 
+        : v
+    ));
+
+    sendPushNotification(
+      '✅ Devolução Concluída',
+      `Carro ${contract.vehiclePlate} devolvido por ${contract.driverName}. Caução liberada no PIX.`
+    );
+  };
+
+  // Real-time odometer update (triggered by driver photo OCR or admin edit)
+  const handleUpdateOdometer = (plate: string, newKm: number) => {
+    // 1. Update vehicle odometer
+    setVehicles(prev => prev.map(v => v.plate === plate ? { ...v, currentKm: newKm } : v));
+
+    // 2. Recalculate maintenance countdowns and status for this vehicle
+    setMaintenanceRules(prev => prev.map(rule => {
+      if (rule.vehiclePlate === plate) {
+        const calc = calculateRemainingKm(newKm, rule.initialKm, rule.intervalKm);
+        return {
+          ...rule,
+          currentKm: newKm,
+          remainingKm: calc.remainingKm,
+          percentageReached: calc.percentage,
+          status: calc.status
+        };
+      }
+      return rule;
+    }));
+  };
+
+  // Toggle Theme (Light / Dark)
+  const handleToggleTheme = () => {
+    const nextTheme: ThemeMode = settings.theme === 'dark' ? 'light' : 'dark';
+    const updated = { ...settings, theme: nextTheme };
+    setSettings(updated);
+    try {
+      localStorage.setItem('cabral_settings', JSON.stringify(updated));
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleUpdateSettings = (newSettings: AppSettings) => {
+    setSettings(newSettings);
+    try {
+      localStorage.setItem('cabral_settings', JSON.stringify(newSettings));
+    } catch {
+      // ignore
+    }
+  };
+
+  const isLight = settings.theme === 'light';
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white">
+    <div className={`min-h-screen font-sans antialiased transition-colors duration-300 ${
+      isLight ? 'bg-slate-100 text-slate-900 selection:bg-brand-500 selection:text-white' : 'bg-slate-950 text-slate-100 selection:bg-brand-500 selection:text-white'
+    }`}>
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
@@ -87,6 +236,9 @@ export const App: React.FC = () => {
         onOpenAuthModal={handleOpenAuth}
         onLogout={handleLogout}
         onOpenContactHub={() => setIsContactHubOpen(true)}
+        onOpenSettings={() => setIsSettingsOpen(true)}
+        theme={settings.theme}
+        onToggleTheme={handleToggleTheme}
         isAdminAuthenticated={isAdminAuthenticated}
         isDriverAuthenticated={isDriverAuthenticated}
       />
@@ -109,7 +261,33 @@ export const App: React.FC = () => {
 
         {activeTab === 'dashboard' && (
           <div className="p-4 sm:p-6 lg:p-8">
-            <DashboardOverview />
+            <DashboardOverview
+              vehicles={vehicles}
+              contracts={contracts}
+              maintenanceRules={maintenanceRules}
+            />
+          </div>
+        )}
+
+        {activeTab === 'locacoes' && (
+          <div className="p-4 sm:p-6 lg:p-8">
+            <RentalManagement
+              contracts={contracts}
+              vehicles={vehicles}
+              pastRentals={pastRentals}
+              onAddContract={handleAddContract}
+              onEndRental={handleEndRental}
+            />
+          </div>
+        )}
+
+        {activeTab === 'frota' && (
+          <div className="p-4 sm:p-6 lg:p-8">
+            <FleetTableWithExport
+              vehicles={vehicles}
+              onOpenAddVehicle={() => setIsAddVehicleOpen(true)}
+              onUpdateVehicleKm={handleUpdateOdometer}
+            />
           </div>
         )}
 
@@ -125,15 +303,12 @@ export const App: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'frota' && (
-          <div className="p-4 sm:p-6 lg:p-8">
-            <FleetTableWithExport />
-          </div>
-        )}
-
         {activeTab === 'motorista' && (
           <div className="p-4 sm:p-6 lg:p-8">
-            <DriverPortal onOpenContactHub={() => setIsContactHubOpen(true)} />
+            <DriverPortal
+              onOpenContactHub={() => setIsContactHubOpen(true)}
+              onUpdateOdometer={handleUpdateOdometer}
+            />
           </div>
         )}
       </main>
@@ -150,8 +325,22 @@ export const App: React.FC = () => {
         onClose={() => setIsAuthModalOpen(false)}
         onLoginSuccess={handleAuthSuccess}
       />
+
+      <AddVehicleModal
+        isOpen={isAddVehicleOpen}
+        onClose={() => setIsAddVehicleOpen(false)}
+        onAddVehicle={handleAddVehicle}
+      />
+
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        settings={settings}
+        onUpdateSettings={handleUpdateSettings}
+      />
     </div>
   );
 };
 
 export default App;
+

@@ -116,6 +116,37 @@ export interface TrafficFine {
   dueDate: string;
 }
 
+export interface PastRental {
+  id: string;
+  vehiclePlate: string;
+  vehicleModel: string;
+  driverName: string;
+  driverPhone: string;
+  driverCnh: string;
+  startDate: string;
+  endDate: string;
+  totalWeeks: number;
+  totalPaid: number;
+  depositAmount: number;
+  depositStatus: 'refunded' | 'retained';
+  startKm: number;
+  endKm: number;
+  totalKmDriven: number;
+  conditionNotes: string;
+}
+
+export type ThemeMode = 'dark' | 'light';
+
+export interface AppSettings {
+  theme: ThemeMode;
+  notificationsEnabled: boolean;
+  cameraPermissionGranted: boolean;
+  companyName: string;
+  pixKey: string;
+  whatsappPhone: string;
+  defaultDepositAmount: number;
+}
+
 export interface DriverScore {
   id: string;
   driverName: string;
@@ -127,3 +158,5 @@ export interface DriverScore {
   zeroFinesMonths: number;
   depositDiscountPercent: number;
 }
+
+

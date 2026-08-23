@@ -14,13 +14,16 @@ import {
 } from './Icons';
 
 interface NavbarProps {
-  activeTab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista';
-  setActiveTab: (tab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista') => void;
+  activeTab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista';
+  setActiveTab: (tab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista') => void;
   userRole: 'admin' | 'driver';
   userProfile: UserProfile | null;
   onOpenAuthModal: (role?: 'admin' | 'driver') => void;
   onLogout: () => void;
   onOpenContactHub: () => void;
+  onOpenSettings: () => void;
+  theme: 'dark' | 'light';
+  onToggleTheme: () => void;
   isAdminAuthenticated: boolean;
   isDriverAuthenticated: boolean;
 }
@@ -33,6 +36,9 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuthModal,
   onLogout,
   onOpenContactHub,
+  onOpenSettings,
+  theme,
+  onToggleTheme,
   isAdminAuthenticated,
   isDriverAuthenticated
 }) => {
@@ -74,6 +80,28 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span>10 KPIs</span>
                 </button>
                 <button
+                  onClick={() => setActiveTab('locacoes')}
+                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'locacoes'
+                      ? 'bg-brand-cyan text-slate-950 shadow-lg shadow-brand-cyan/20 font-black'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <KeyIcon className="w-4 h-4" />
+                  <span>Locações & Contratos</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('frota')}
+                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'frota'
+                      ? 'bg-slate-700 text-white shadow-lg font-black'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <CarIcon className="w-4 h-4" />
+                  <span>Frota</span>
+                </button>
+                <button
                   onClick={() => setActiveTab('manutencao')}
                   className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'manutencao'
@@ -94,17 +122,6 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <SparklesIcon className="w-4 h-4" />
                   <span>Insights IA</span>
-                </button>
-                <button
-                  onClick={() => setActiveTab('frota')}
-                  className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                    activeTab === 'frota'
-                      ? 'bg-slate-700 text-white shadow-lg font-black'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
-                  }`}
-                >
-                  <CarIcon className="w-4 h-4" />
-                  <span>Frota</span>
                 </button>
               </>
             ) : (
@@ -128,8 +145,26 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </nav>
 
-          {/* Right Action Controls: Login Profile, Bell, Official WhatsApp */}
+          {/* Right Action Controls: Theme Toggle, Settings, Profile, WhatsApp */}
           <div className="flex items-center space-x-2 sm:space-x-3">
+            
+            {/* Quick Theme Toggle (Light / Dark) */}
+            <button
+              onClick={onToggleTheme}
+              className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
+              title={`Alternar para tema ${theme === 'dark' ? 'Claro' : 'Escuro'}`}
+            >
+              <span>{theme === 'dark' ? '☀️' : '🌙'}</span>
+            </button>
+
+            {/* Settings Gear */}
+            <button
+              onClick={onOpenSettings}
+              className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-300 hover:text-white transition-all cursor-pointer"
+              title="Configurações & Permissões"
+            >
+              <span>⚙️</span>
+            </button>
             
             {/* Notification Bell (for logged Admin) */}
             {isAdminAuthenticated && userRole === 'admin' && (

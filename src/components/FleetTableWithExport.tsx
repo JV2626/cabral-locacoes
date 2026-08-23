@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { mockVehicles } from '../lib/mock-data';
+import { Vehicle } from '../types/fleet';
 import { formatCurrency, formatKm } from '../lib/utils/calculations';
 import { exportFleetToCsv } from '../lib/utils/export';
 import {
@@ -10,11 +10,23 @@ import {
   WrenchIcon
 } from './Icons';
 
-export const FleetTableWithExport: React.FC = () => {
+interface FleetTableWithExportProps {
+  vehicles?: Vehicle[];
+  onOpenAddVehicle?: () => void;
+  onUpdateVehicleKm?: (plate: string, km: number) => void;
+}
+
+export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
+  vehicles = [],
+  onOpenAddVehicle,
+  onUpdateVehicleKm
+}) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [editingPlate, setEditingPlate] = useState<string | null>(null);
+  const [kmInput, setKmInput] = useState<number>(0);
 
-  const filteredVehicles = mockVehicles.filter(v => {
+  const filteredVehicles = vehicles.filter(v => {
     const matchesSearch = v.model.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           v.plate.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           (v.currentDriver && v.currentDriver.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -22,8 +34,15 @@ export const FleetTableWithExport: React.FC = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const handleSaveKm = (plate: string) => {
+    if (onUpdateVehicleKm && kmInput > 0) {
+      onUpdateVehicleKm(plate, kmInput);
+    }
+    setEditingPlate(null);
+  };
+
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
+    <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans animate-in fade-in">
       {/* Title Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 p-6 rounded-3xl shadow-xl border border-slate-800">
         <div className="flex items-center space-x-3">
@@ -31,19 +50,29 @@ export const FleetTableWithExport: React.FC = () => {
             <CarIcon className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-white tracking-tight font-display">Gestão da Frota</h1>
-            <p className="text-xs text-slate-400 font-medium">Controle de veículos, motoristas ativos e exportação de relatórios contábeis</p>
+            <h1 className="text-2xl font-black text-white tracking-tight font-display">Gestão da Frota & Estoque</h1>
+            <p className="text-xs text-slate-400 font-medium">Controle de {vehicles.length} veículos, odômetros e exportação de relatórios</p>
           </div>
         </div>
 
-        {/* Action Buttons for Exporting */}
-        <div className="flex items-center space-x-2">
+        {/* Action Buttons: Add Vehicle & Export */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {onOpenAddVehicle && (
+            <button
+              onClick={onOpenAddVehicle}
+              className="flex items-center space-x-2 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-5 py-3 rounded-2xl text-xs font-black transition-all shadow-lg shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
+            >
+              <CarIcon className="w-4 h-4" />
+              <span>+ Cadastrar Carro</span>
+            </button>
+          )}
+
           <button
             onClick={() => exportFleetToCsv(filteredVehicles)}
-            className="flex items-center space-x-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white px-5 py-3 rounded-2xl text-xs font-black transition-all shadow-lg shadow-emerald-600/20 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
+            className="flex items-center space-x-2 bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 px-5 py-3 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
           >
             <DownloadIcon className="w-4 h-4" />
-            <span>Exportar CSV / Excel</span>
+            <span>Exportar CSV</span>
           </button>
         </div>
       </div>
@@ -107,8 +136,44 @@ export const FleetTableWithExport: React.FC = () => {
                       {vehicle.category}
                     </span>
                   </td>
-                  <td className="py-4 px-5 font-bold text-white font-mono">
-                    {formatKm(vehicle.currentKm)}
+                  <td className="py-4 px-5">
+                    {editingPlate === vehicle.plate ? (
+                      <div className="flex items-center space-x-1.5">
+                        <input
+                          type="number"
+                          value={kmInput}
+                          onChange={(e) => setKmInput(Number(e.target.value))}
+                          className="w-24 bg-slate-950 border border-brand-500 rounded-lg px-2 py-1 text-xs text-white font-mono font-bold"
+                          autoFocus
+                        />
+                        <button
+                          onClick={() => handleSaveKm(vehicle.plate)}
+                          className="bg-brand-500 hover:bg-brand-600 text-white text-[10px] font-bold px-2 py-1 rounded-md"
+                        >
+                          Salvar
+                        </button>
+                        <button
+                          onClick={() => setEditingPlate(null)}
+                          className="text-slate-400 hover:text-white text-[10px] px-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold text-white font-mono">{formatKm(vehicle.currentKm)}</span>
+                        <button
+                          onClick={() => {
+                            setEditingPlate(vehicle.plate);
+                            setKmInput(vehicle.currentKm);
+                          }}
+                          className="text-[10px] text-slate-500 hover:text-brand-cyan transition-colors"
+                          title="Atualizar Odômetro"
+                        >
+                          ✏️
+                        </button>
+                      </div>
+                    )}
                   </td>
                   <td className="py-4 px-5">
                     <span

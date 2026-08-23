@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { mockKpiMetrics, mockContracts, mockTrafficFines, mockDriverScores } from '../lib/mock-data';
+import { Vehicle, Contract, MaintenanceRule } from '../types/fleet';
+import { mockKpiMetrics, mockContracts, mockTrafficFines, mockDriverScores, mockVehicles, mockMaintenanceRules } from '../lib/mock-data';
 import { formatCurrency } from '../lib/utils/calculations';
 import {
   WrenchIcon,
@@ -12,10 +13,35 @@ import {
   WhatsAppIcon
 } from './Icons';
 
-export const DashboardOverview: React.FC = () => {
+interface DashboardOverviewProps {
+  vehicles?: Vehicle[];
+  contracts?: Contract[];
+  maintenanceRules?: MaintenanceRule[];
+}
+
+export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
+  vehicles = mockVehicles,
+  contracts = mockContracts,
+  maintenanceRules = mockMaintenanceRules
+}) => {
   const [period, setPeriod] = useState('Mês Atual');
   const [fines, setFines] = useState(mockTrafficFines);
   const [transferToast, setTransferToast] = useState<string | null>(null);
+
+  // Dynamic Real-time Calculations
+  const oilChangesPending = maintenanceRules.filter(
+    m => m.serviceType === 'oleo' && (m.status === 'red' || m.status === 'yellow')
+  ).length;
+
+  const inspectionsPending = maintenanceRules.filter(
+    m => m.serviceType === 'revisao_geral' && (m.status === 'red' || m.status === 'yellow')
+  ).length;
+
+  const activeRentals = contracts.length;
+  const availableVehicles = vehicles.filter(v => v.status === 'available').length;
+  const rentedVehicles = vehicles.filter(v => v.status === 'rented').length;
+  const upcomingReceivables = contracts.reduce((acc, c) => acc + c.rate, 0);
+  const overdueAmount = contracts.filter(c => c.status === 'overdue').reduce((acc, c) => acc + c.rate, 0);
 
   const handleTransferFine = (id: string, driverName: string, points: number) => {
     setFines(prev => prev.map(f => f.id === id ? { ...f, status: 'transferred' } : f));
@@ -65,7 +91,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">TROCA DE ÓLEO</span>
-              <span className="text-xl font-black text-white">{mockKpiMetrics.oilChangesPending}</span>
+              <span className="text-xl font-black text-amber-400">{oilChangesPending}</span>
             </div>
           </div>
 
@@ -79,7 +105,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">VISTORIAS</span>
-              <span className="text-xl font-black text-white">{mockKpiMetrics.inspectionsPending}</span>
+              <span className="text-xl font-black text-white">{inspectionsPending}</span>
             </div>
           </div>
 
@@ -93,7 +119,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">LOCAÇÕES ATIVAS</span>
-              <span className="text-xl font-black text-white">{mockKpiMetrics.activeRentals}</span>
+              <span className="text-xl font-black text-white">{activeRentals}</span>
             </div>
           </div>
 
@@ -107,7 +133,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">DISPONÍVEIS</span>
-              <span className="text-xl font-black text-emerald-400">{mockKpiMetrics.availableVehicles}</span>
+              <span className="text-xl font-black text-emerald-400">{availableVehicles}</span>
             </div>
           </div>
 
@@ -121,7 +147,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">EM LOCAÇÃO</span>
-              <span className="text-xl font-black text-white">{mockKpiMetrics.rentedVehicles}</span>
+              <span className="text-xl font-black text-white">{rentedVehicles}</span>
             </div>
           </div>
 
@@ -135,7 +161,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">INVESTIDO</span>
-              <span className="text-sm sm:text-base font-black text-white">{formatCurrency(mockKpiMetrics.totalInvested)}</span>
+              <span className="text-sm sm:text-base font-black text-white">{formatCurrency(vehicles.length * 75000)}</span>
             </div>
           </div>
 
@@ -149,7 +175,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">A VENCER</span>
-              <span className="text-sm sm:text-base font-black text-white">{formatCurrency(mockKpiMetrics.upcomingReceivables)}</span>
+              <span className="text-sm sm:text-base font-black text-white">{formatCurrency(upcomingReceivables)}</span>
             </div>
           </div>
 
@@ -167,7 +193,7 @@ export const DashboardOverview: React.FC = () => {
             </div>
           </div>
 
-          {/* 9. Em Atraso */}
+          {/* 9. Inadimplência */}
           <div className="bg-slate-900 p-4 rounded-2xl shadow-lg border border-slate-800 border-l-4 border-l-rose-500 flex flex-col justify-between hover:border-slate-700 transition-all">
             <div className="flex items-center justify-between mb-2">
               <div className="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
@@ -176,8 +202,8 @@ export const DashboardOverview: React.FC = () => {
               <span className="w-5 h-5 rounded-full bg-slate-800 text-slate-400 text-[10px] flex items-center justify-center font-bold">i</span>
             </div>
             <div>
-              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">EM ATRASO</span>
-              <span className="text-sm sm:text-base font-black text-rose-400">{formatCurrency(mockKpiMetrics.overdueAmount)}</span>
+              <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider block">INADIMPLÊNCIA</span>
+              <span className="text-sm sm:text-base font-black text-rose-400">{formatCurrency(overdueAmount)}</span>
             </div>
           </div>
 
