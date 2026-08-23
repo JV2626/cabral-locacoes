@@ -59,46 +59,24 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
               <span>Locação Especializada para Motoristas de App</span>
             </div>
 
-            {/* Main Headline with Uber & 99 Badges */}
+            {/* Main Headline with Animated Uber & 99 Badges */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight font-display">
               Alugue seu carro para rodar na{' '}
-              <span className="inline-flex items-center align-middle gap-1.5 sm:gap-2.5 bg-slate-900 border border-slate-700/90 px-3 py-1.5 sm:px-4 sm:py-2 rounded-2xl shadow-2xl mx-1.5 my-1.5 hover:border-brand-500/60 transition-all">
-                <span className="bg-black text-white text-xs sm:text-base font-black px-2.5 py-1 rounded-xl flex items-center gap-1.5 border border-slate-800 tracking-wider shadow-inner font-sans">
-                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-white"></span>
+              <span className="animate-badge-glow inline-flex items-center align-middle gap-1.5 sm:gap-2.5 bg-slate-900/95 border border-slate-700/80 px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-2xl shadow-2xl mx-1.5 my-1.5 hover:scale-105 transition-all cursor-default">
+                <span className="animate-uber-pulse bg-black text-white text-xs sm:text-base font-black px-3 py-1 rounded-xl flex items-center gap-1.5 border border-slate-800 tracking-wider shadow-inner font-sans">
+                  <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-brand-cyan animate-ping"></span>
                   Uber
                 </span>
                 <span className="text-slate-500 font-extrabold text-xs sm:text-sm">&</span>
-                <span className="bg-[#FFCC00] text-black text-xs sm:text-base font-black px-2.5 py-1 rounded-xl flex items-center tracking-tight shadow-md font-sans">
+                <span className="animate-99-pulse bg-[#FFCC00] text-black text-xs sm:text-base font-black px-3 py-1 rounded-xl flex items-center tracking-tight shadow-md font-sans">
                   99
                 </span>
               </span>{' '}
               sem burocracia
             </h1>
 
-            {/* Mobility Apps & Category Badges Banner */}
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-              <div className="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 shadow-md">
-                <div className="w-5 h-5 rounded-md bg-black text-white text-[10px] font-black flex items-center justify-center">
-                  U
-                </div>
-                <span>UberX · Comfort · Black</span>
-              </div>
-
-              <div className="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 shadow-md">
-                <div className="w-5 h-5 rounded-md bg-[#FFCC00] text-black text-[10px] font-black flex items-center justify-center shadow-xs">
-                  99
-                </div>
-                <span>99Pop · 99Plus · 99Negocia</span>
-              </div>
-
-              <div className="flex items-center space-x-2 bg-slate-900/90 border border-slate-800 px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-300 shadow-md">
-                <ShieldCheckIcon className="w-4 h-4 text-brand-cyan" />
-                <span>100% Homologados</span>
-              </div>
-            </div>
-
             <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Retirada expressa em 2 minutos, manutenção preventiva 100% inclusa, caução facilitada no PIX e suporte humanizado direto com quem resolve.
+              Carros 100% homologados e aprovados para rodar. Retirada expressa em 2 minutos, manutenção preventiva inclusa, caução facilitada e suporte direto.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
