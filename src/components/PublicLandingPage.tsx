@@ -476,10 +476,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
                 </p>
                 <button
                   onClick={onOpenContactHub}
-                  className="w-full mt-2 flex items-center justify-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-black py-3 rounded-xl text-xs transition-all shadow-md shadow-[#25D366]/20 active:scale-95 cursor-pointer uppercase tracking-wider"
+                  className="w-full mt-3 inline-flex items-center justify-center text-center gap-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white font-black py-3.5 px-4 rounded-2xl text-xs sm:text-sm transition-all shadow-lg shadow-[#25D366]/30 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
                 >
-                  <WhatsAppIcon className="w-4 h-4 fill-white" />
-                  <span>Garantir Meu Carro no WhatsApp</span>
+                  <WhatsAppIcon className="w-5 h-5 fill-white shrink-0" />
+                  <span className="leading-tight text-center">Garantir Meu Carro no WhatsApp</span>
                 </button>
               </div>
             </div>

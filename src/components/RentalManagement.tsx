@@ -263,59 +263,148 @@ export const RentalManagement: React.FC<RentalManagementProps> = ({
 
       {/* HISTORY TAB */}
       {activeSubTab === 'history' && (
-        <div className="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
-          <div className="p-5 border-b border-slate-800">
-            <h3 className="text-base font-black text-white font-display">Histórico de Locações Encerradas & Vistorias</h3>
-            <p className="text-xs text-slate-400">Registro histórico completo de motoristas e KM rodados</p>
+        <div className="space-y-4">
+          <div className="bg-slate-900 p-5 rounded-3xl border border-slate-800 shadow-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h3 className="text-base font-black text-white font-display">Histórico de Locações Encerradas & Vistorias</h3>
+              <p className="text-xs text-slate-400">Registro histórico completo de motoristas e KM rodados</p>
+            </div>
+            <span className="text-xs font-bold text-slate-400 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 self-start sm:self-auto">
+              Total: <strong className="text-white">{pastRentals.length} locações</strong>
+            </span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950 text-slate-400 font-black uppercase text-[10px] tracking-wider border-b border-slate-800">
-                <tr>
-                  <th className="p-4">Motorista</th>
-                  <th className="p-4">Veículo / Placa</th>
-                  <th className="p-4">Período</th>
-                  <th className="p-4">Total Pago</th>
-                  <th className="p-4">KM Rodado</th>
-                  <th className="p-4">Caução</th>
-                  <th className="p-4">Laudo de Devolução</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/80">
-                {pastRentals.map(past => (
-                  <tr key={past.id} className="hover:bg-slate-800/40 transition-colors">
-                    <td className="p-4">
-                      <span className="font-bold text-white block">{past.driverName}</span>
-                      <span className="text-[11px] text-slate-400">{past.driverPhone}</span>
-                    </td>
-                    <td className="p-4">
-                      <span className="font-bold text-slate-200 block">{past.vehicleModel}</span>
-                      <span className="font-mono text-brand-cyan text-[11px] font-bold">{past.vehiclePlate}</span>
-                    </td>
-                    <td className="p-4">
-                      <span className="text-slate-300 font-medium block">{past.startDate} até {past.endDate}</span>
-                      <span className="text-[10px] text-slate-500">{past.totalWeeks} semanas alugado</span>
-                    </td>
-                    <td className="p-4 font-black text-emerald-400">
-                      {formatCurrency(past.totalPaid)}
-                    </td>
-                    <td className="p-4">
-                      <span className="font-bold text-white block">{formatKm(past.totalKmDriven)}</span>
-                      <span className="text-[10px] text-slate-500 font-mono">({formatKm(past.startKm)} ➔ {formatKm(past.endKm)})</span>
-                    </td>
-                    <td className="p-4">
-                      <span className="inline-flex items-center text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md">
-                        ✓ Devolvida PIX
+          {/* MOBILE CARDS VIEW (< md) */}
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {pastRentals.map((past) => (
+              <div
+                key={past.id}
+                className="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl space-y-4 relative overflow-hidden"
+              >
+                {/* Header: Driver + WhatsApp Link + Total Paid */}
+                <div className="flex items-start justify-between gap-3 border-b border-slate-800 pb-3">
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-base font-black text-white">{past.driverName}</span>
+                      <span className="text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                        Devolvido
                       </span>
-                    </td>
-                    <td className="p-4 text-slate-400 max-w-xs truncate text-[11px]">
-                      {past.conditionNotes}
-                    </td>
+                    </div>
+                    <a
+                      href={`https://wa.me/55${past.driverPhone.replace(/\D/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center space-x-1 text-xs text-emerald-400 font-bold hover:underline mt-0.5"
+                    >
+                      <WhatsAppIcon className="w-3.5 h-3.5 fill-current" />
+                      <span>{past.driverPhone}</span>
+                    </a>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Total Pago</span>
+                    <span className="text-lg font-black text-emerald-400">
+                      {formatCurrency(past.totalPaid)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Car Details */}
+                <div className="flex items-center justify-between bg-slate-950/80 p-3 rounded-2xl border border-slate-800/80">
+                  <div>
+                    <span className="text-xs font-bold text-slate-200 block">{past.vehicleModel}</span>
+                    <span className="text-[10px] text-slate-400">{past.totalWeeks} semanas alugado</span>
+                  </div>
+                  <span className="font-mono text-xs font-black text-brand-cyan bg-brand-500/10 border border-brand-500/30 px-2.5 py-1 rounded-lg">
+                    {past.vehiclePlate}
+                  </span>
+                </div>
+
+                {/* Metrics Grid 2x2 */}
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">📅 Período</span>
+                    <span className="font-medium text-slate-200 text-[11px] block">{past.startDate}</span>
+                    <span className="text-slate-400 text-[10px]">até {past.endDate}</span>
+                  </div>
+
+                  <div className="bg-slate-950 p-3 rounded-xl border border-slate-800/60">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">🛣️ KM Rodado</span>
+                    <span className="font-bold text-white text-xs block">{formatKm(past.totalKmDriven)}</span>
+                    <span className="text-[10px] text-slate-500 font-mono">({formatKm(past.startKm)} ➔ {formatKm(past.endKm)})</span>
+                  </div>
+                </div>
+
+                {/* Deposit & Inspection Notes */}
+                <div className="space-y-2 pt-1 border-t border-slate-800/60">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-slate-400 font-bold">Caução:</span>
+                    <span className="inline-flex items-center text-[11px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-lg">
+                      ✓ Devolvida no PIX ({formatCurrency(past.depositAmount || 800)})
+                    </span>
+                  </div>
+
+                  {past.conditionNotes && (
+                    <div className="bg-slate-950/90 p-3 rounded-xl border border-slate-800/80 text-[11px]">
+                      <span className="text-[10px] font-bold text-slate-400 uppercase block mb-0.5">📋 Laudo de Devolução:</span>
+                      <p className="text-slate-300 italic">{past.conditionNotes}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* DESKTOP TABLE VIEW (>= md) */}
+          <div className="hidden md:block bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-xl">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-950 text-slate-400 font-black uppercase text-[10px] tracking-wider border-b border-slate-800">
+                  <tr>
+                    <th className="p-4">Motorista</th>
+                    <th className="p-4">Veículo / Placa</th>
+                    <th className="p-4">Período</th>
+                    <th className="p-4">Total Pago</th>
+                    <th className="p-4">KM Rodado</th>
+                    <th className="p-4">Caução</th>
+                    <th className="p-4">Laudo de Devolução</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800/80">
+                  {pastRentals.map(past => (
+                    <tr key={past.id} className="hover:bg-slate-800/40 transition-colors">
+                      <td className="p-4">
+                        <span className="font-bold text-white block">{past.driverName}</span>
+                        <span className="text-[11px] text-slate-400">{past.driverPhone}</span>
+                      </td>
+                      <td className="p-4">
+                        <span className="font-bold text-slate-200 block">{past.vehicleModel}</span>
+                        <span className="font-mono text-brand-cyan text-[11px] font-bold">{past.vehiclePlate}</span>
+                      </td>
+                      <td className="p-4">
+                        <span className="text-slate-300 font-medium block">{past.startDate} até {past.endDate}</span>
+                        <span className="text-[10px] text-slate-500">{past.totalWeeks} semanas alugado</span>
+                      </td>
+                      <td className="p-4 font-black text-emerald-400">
+                        {formatCurrency(past.totalPaid)}
+                      </td>
+                      <td className="p-4">
+                        <span className="font-bold text-white block">{formatKm(past.totalKmDriven)}</span>
+                        <span className="text-[10px] text-slate-500 font-mono">({formatKm(past.startKm)} ➔ {formatKm(past.endKm)})</span>
+                      </td>
+                      <td className="p-4">
+                        <span className="inline-flex items-center text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-md">
+                          ✓ Devolvida PIX
+                        </span>
+                      </td>
+                      <td className="p-4 text-slate-400 max-w-xs truncate text-[11px]">
+                        {past.conditionNotes}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
