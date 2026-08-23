@@ -1,50 +1,49 @@
 import React, { useState } from 'react';
+import { BrandLogo } from './BrandLogo';
 import { NotificationsDropdown } from './NotificationsDropdown';
+import { UserProfile } from './AuthModal';
 
 interface NavbarProps {
   activeTab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista';
   setActiveTab: (tab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista') => void;
   userRole: 'admin' | 'driver';
-  setUserRole: (role: 'admin' | 'driver') => void;
+  userProfile: UserProfile | null;
+  onOpenAuthModal: (role?: 'admin' | 'driver') => void;
+  onLogout: () => void;
   onOpenContactHub: () => void;
-  onSelectAdminRole: () => void;
   isAdminAuthenticated: boolean;
+  isDriverAuthenticated: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeTab,
   setActiveTab,
   userRole,
-  setUserRole,
+  userProfile,
+  onOpenAuthModal,
+  onLogout,
   onOpenContactHub,
-  onSelectAdminRole,
-  isAdminAuthenticated
+  isAdminAuthenticated,
+  isDriverAuthenticated
 }) => {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 bg-slate-900 border-b border-slate-800 text-white shadow-md">
+    <header className="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-slate-800 text-white shadow-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand Logo */}
-          <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('public')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-inner text-xl">
-              C
-            </div>
-            <div>
-              <span className="text-lg font-extrabold tracking-tight text-white">CABRAL</span>
-              <span className="text-emerald-400 font-semibold ml-1 text-sm tracking-wide uppercase">Locações</span>
-            </div>
-          </div>
+        <div className="flex items-center justify-between h-16 sm:h-20">
+          
+          {/* Brand Official Logo */}
+          <BrandLogo size="md" onClick={() => setActiveTab('public')} />
 
-          {/* Navigation Tabs */}
-          <nav className="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60">
+          {/* Center Navigation Tabs */}
+          <nav className="hidden lg:flex items-center space-x-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner">
             <button
               onClick={() => setActiveTab('public')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                 activeTab === 'public'
-                  ? 'bg-emerald-500 text-slate-950 shadow-sm font-black'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                  ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/25 font-black'
+                  : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
               }`}
             >
               🌐 Site da Marca
@@ -54,40 +53,40 @@ export const Navbar: React.FC<NavbarProps> = ({
               <>
                 <button
                   onClick={() => setActiveTab('dashboard')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'dashboard'
-                      ? 'bg-blue-600 text-white shadow-sm'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                      ? 'bg-brand-500 text-white shadow-lg shadow-brand-500/25 font-black'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
                   📊 10 KPIs
                 </button>
                 <button
                   onClick={() => setActiveTab('manutencao')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'manutencao'
-                      ? 'bg-amber-500 text-slate-950 shadow-sm font-bold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                      ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/25 font-black'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
                   🔧 Manutenção por KM
                 </button>
                 <button
                   onClick={() => setActiveTab('insights')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'insights'
-                      ? 'bg-purple-600 text-white shadow-sm font-bold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                      ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/25 font-black'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
                   🧠 Insights IA
                 </button>
                 <button
                   onClick={() => setActiveTab('frota')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'frota'
-                      ? 'bg-slate-700 text-white shadow-sm font-bold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                      ? 'bg-slate-700 text-white shadow-lg font-black'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                   }`}
                 >
                   🚗 Frota
@@ -95,26 +94,33 @@ export const Navbar: React.FC<NavbarProps> = ({
               </>
             ) : (
               <button
-                onClick={() => setActiveTab('motorista')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                onClick={() => {
+                  if (isDriverAuthenticated) {
+                    setActiveTab('motorista');
+                  } else {
+                    onOpenAuthModal('driver');
+                  }
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'motorista'
-                    ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                    : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
+                    ? 'bg-brand-cyan text-slate-950 shadow-lg shadow-brand-cyan/20 font-black'
+                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
               >
-                📱 Área do Motorista (Uber/99)
+                📱 Portal do Motorista (Uber/99)
               </button>
             )}
           </nav>
 
-          {/* Role Switcher, Notification Bell & Contact Hub CTA */}
-          <div className="flex items-center space-x-2 sm:space-x-2.5 relative">
-            {/* Notification Bell (Only for Admin when authenticated) */}
-            {userRole === 'admin' && isAdminAuthenticated && (
+          {/* Right Action Controls: Login Profile, Bell, WhatsApp */}
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            
+            {/* Notification Bell (for logged Admin) */}
+            {isAdminAuthenticated && userRole === 'admin' && (
               <div className="relative">
                 <button
                   onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-                  className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-sm transition-all relative cursor-pointer"
+                  className="w-10 h-10 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 flex items-center justify-center text-sm transition-all relative cursor-pointer"
                   title="Central de Notificações"
                 >
                   <span>🔔</span>
@@ -134,36 +140,47 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
             )}
 
-            {/* User Role Switcher Dropdown */}
-            <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-1 text-xs">
+            {/* Authentication / Profile Status Button */}
+            {isAdminAuthenticated && userRole === 'admin' ? (
+              <div className="flex items-center space-x-2 bg-slate-900 border border-brand-500/40 px-3 py-1.5 rounded-xl text-xs">
+                <span className="w-2 h-2 rounded-full bg-brand-cyan animate-pulse"></span>
+                <span className="font-bold text-white hidden sm:inline">👑 Admin Ativo</span>
+                <button
+                  onClick={onLogout}
+                  className="text-[10px] bg-slate-800 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 px-2 py-0.5 rounded-md transition-colors font-bold ml-1 cursor-pointer"
+                  title="Sair da conta"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : isDriverAuthenticated && userRole === 'driver' ? (
+              <div className="flex items-center space-x-2 bg-slate-900 border border-brand-cyan/40 px-3 py-1.5 rounded-xl text-xs">
+                <span className="w-2 h-2 rounded-full bg-brand-cyan"></span>
+                <span className="font-bold text-brand-cyan truncate max-w-[100px] sm:max-w-[150px]">
+                  {userProfile?.name || 'Motorista'}
+                </span>
+                <button
+                  onClick={onLogout}
+                  className="text-[10px] bg-slate-800 hover:bg-rose-500/20 text-rose-300 hover:text-rose-200 px-2 py-0.5 rounded-md transition-colors font-bold ml-1 cursor-pointer"
+                  title="Sair da conta"
+                >
+                  Sair
+                </button>
+              </div>
+            ) : (
               <button
-                onClick={onSelectAdminRole}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                  userRole === 'admin' && isAdminAuthenticated
-                    ? 'bg-blue-600 text-white shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
+                onClick={() => onOpenAuthModal('driver')}
+                className="flex items-center space-x-1.5 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-3.5 py-2 rounded-xl font-black text-xs transition-all shadow-md shadow-brand-500/25 active:scale-95 cursor-pointer"
               >
-                {isAdminAuthenticated ? '👑 Admin' : '🔒 Entrar Admin'}
+                <span>🔑</span>
+                <span>Entrar / Cadastrar</span>
               </button>
-              <button
-                onClick={() => {
-                  setUserRole('driver');
-                  setActiveTab('motorista');
-                }}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
-                  userRole === 'driver'
-                    ? 'bg-emerald-500 text-slate-950 shadow-xs'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                🚗 Motorista
-              </button>
-            </div>
+            )}
 
+            {/* WhatsApp CTA */}
             <button
               onClick={onOpenContactHub}
-              className="flex items-center space-x-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-3.5 py-1.5 rounded-xl font-bold text-xs transition-all shadow-md active:scale-95 cursor-pointer"
+              className="flex items-center space-x-1.5 bg-brand-cyan hover:bg-brand-300 text-slate-950 px-3.5 py-2 rounded-xl font-black text-xs transition-all shadow-md shadow-brand-cyan/20 active:scale-95 cursor-pointer"
             >
               <span>💬</span>
               <span className="hidden sm:inline">WhatsApp</span>

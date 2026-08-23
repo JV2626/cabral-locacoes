@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { PublicLandingPage } from './components/PublicLandingPage';
 import { DashboardOverview } from './components/DashboardOverview';
@@ -7,44 +7,91 @@ import { AiCopilotAndInsights } from './components/AiCopilotAndInsights';
 import { FleetTableWithExport } from './components/FleetTableWithExport';
 import { DriverPortal } from './components/DriverPortal';
 import { ContactHubModal } from './components/ContactHubModal';
-import { AdminLoginModal } from './components/AdminLoginModal';
+import { AuthModal, UserProfile } from './components/AuthModal';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista'>('public');
   const [userRole, setUserRole] = useState<'admin' | 'driver'>('driver');
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
-  const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
+  const [isDriverAuthenticated, setIsDriverAuthenticated] = useState(false);
+  
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authModalInitialRole, setAuthModalInitialRole] = useState<'admin' | 'driver'>('driver');
   const [isContactHubOpen, setIsContactHubOpen] = useState(false);
 
-  const handleSelectAdminRole = () => {
-    if (!isAdminAuthenticated) {
-      setIsAdminLoginModalOpen(true);
-    } else {
-      setUserRole('admin');
+  // Load saved profile from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cabral_user_profile');
+      if (saved) {
+        const parsed = JSON.parse(saved) as UserProfile;
+        setUserProfile(parsed);
+        if (parsed.role === 'admin') {
+          setIsAdminAuthenticated(true);
+        } else {
+          setIsDriverAuthenticated(true);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleOpenAuth = (role: 'admin' | 'driver' = 'driver') => {
+    setAuthModalInitialRole(role);
+    setIsAuthModalOpen(true);
+  };
+
+  const handleAuthSuccess = (profile: UserProfile) => {
+    setUserProfile(profile);
+    setUserRole(profile.role);
+    
+    if (profile.role === 'admin') {
+      setIsAdminAuthenticated(true);
       setActiveTab('dashboard');
+    } else {
+      setIsDriverAuthenticated(true);
+      setActiveTab('motorista');
+    }
+
+    try {
+      localStorage.setItem('cabral_user_profile', JSON.stringify(profile));
+    } catch {
+      // ignore
     }
   };
 
-  const handleAdminLoginSuccess = () => {
-    setIsAdminAuthenticated(true);
-    setUserRole('admin');
-    setActiveTab('dashboard');
+  const handleLogout = () => {
+    setIsAdminAuthenticated(false);
+    setIsDriverAuthenticated(false);
+    setUserProfile(null);
+    setUserRole('driver');
+    setActiveTab('public');
+    try {
+      localStorage.removeItem('cabral_user_profile');
+    } catch {
+      // ignore
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-slate-950">
-      {/* Top Sticky Navigation with Role Switcher */}
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans antialiased selection:bg-brand-500 selection:text-white">
+      {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         userRole={userRole}
-        setUserRole={setUserRole}
+        userProfile={userProfile}
+        onOpenAuthModal={handleOpenAuth}
+        onLogout={handleLogout}
         onOpenContactHub={() => setIsContactHubOpen(true)}
-        onSelectAdminRole={handleSelectAdminRole}
         isAdminAuthenticated={isAdminAuthenticated}
+        isDriverAuthenticated={isDriverAuthenticated}
       />
 
-      {/* Main Content Area */}
+      {/* Main Content View */}
       <main className="transition-all">
         {activeTab === 'public' && (
           <PublicLandingPage
@@ -53,9 +100,10 @@ export const App: React.FC = () => {
               if (isAdminAuthenticated) {
                 setActiveTab('dashboard');
               } else {
-                setIsAdminLoginModalOpen(true);
+                handleOpenAuth('admin');
               }
             }}
+            onOpenDriverAuth={() => handleOpenAuth('driver')}
           />
         )}
 
@@ -96,10 +144,11 @@ export const App: React.FC = () => {
         onClose={() => setIsContactHubOpen(false)}
       />
 
-      <AdminLoginModal
-        isOpen={isAdminLoginModalOpen}
-        onClose={() => setIsAdminLoginModalOpen(false)}
-        onLoginSuccess={handleAdminLoginSuccess}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        initialRole={authModalInitialRole}
+        onClose={() => setIsAuthModalOpen(false)}
+        onLoginSuccess={handleAuthSuccess}
       />
     </div>
   );

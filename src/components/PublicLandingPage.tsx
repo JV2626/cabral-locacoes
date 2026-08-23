@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { mockVehicles } from '../lib/mock-data';
 import { formatCurrency } from '../lib/utils/calculations';
+import { BrandLogo } from './BrandLogo';
 
 interface PublicLandingPageProps {
   onOpenContactHub: () => void;
   onGoToDashboard: () => void;
+  onOpenDriverAuth?: () => void;
 }
 
-export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenContactHub, onGoToDashboard }) => {
+export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
+  onOpenContactHub,
+  onGoToDashboard,
+  onOpenDriverAuth
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'Hatch' | 'Sedan' | 'SUV'>('all');
   const [simulatorHours, setSimulatorHours] = useState(8);
   const [simulatorCarType, setSimulatorCarType] = useState('sedan');
@@ -18,63 +24,76 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
 
   // Estimator logic
   const weeklyRentalCost = simulatorCarType === 'sedan' ? 560 : 490;
-  const estimatedMonthlyGross = simulatorHours * 35 * 26; // R$ 35/h * 26 dias
-  const estimatedMonthlyNet = estimatedMonthlyGross - (weeklyRentalCost * 4.2) - (simulatorHours * 15 * 26); // menos aluguel e combustível
+  const estimatedMonthlyGross = simulatorHours * 38 * 26; // R$ 38/h * 26 dias
+  const estimatedMonthlyNet = estimatedMonthlyGross - (weeklyRentalCost * 4.2) - (simulatorHours * 16 * 26);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
+    <div className="min-h-screen bg-brand-dark text-slate-100 font-sans selection:bg-brand-500 selection:text-white">
       
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 border-b border-slate-800 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950">
+      <section className="relative overflow-hidden pt-12 pb-24 border-b border-slate-800 bg-radial from-brand-900/60 via-brand-dark to-brand-dark">
+        
+        {/* Glow ambient background effects */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 sm:w-[600px] h-96 bg-brand-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/3 left-1/3 w-72 h-72 bg-brand-cyan/10 rounded-full blur-3xl pointer-events-none"></div>
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto space-y-6">
-            <div className="inline-flex items-center space-x-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-4 py-1.5 rounded-full text-xs font-extrabold tracking-wide uppercase">
-              <span>🚗</span>
+            
+            {/* Center Brand Badge */}
+            <div className="flex justify-center mb-2">
+              <BrandLogo size="lg" />
+            </div>
+
+            <div className="inline-flex items-center space-x-2 bg-brand-500/10 border border-brand-500/30 text-brand-cyan px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase">
+              <span>⚡</span>
               <span>Locação Especializada para Motoristas de App</span>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
-              Alugue seu carro para rodar na <span className="text-emerald-400">Uber & 99</span> sem dor de cabeça
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight font-display">
+              Alugue seu carro para rodar na <span className="bg-gradient-to-r from-brand-400 via-brand-cyan to-white bg-clip-text text-transparent italic">Uber & 99</span> sem burocracia
             </h1>
 
             <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed">
-              Retirada rápida em 2 minutos, manutenção 100% inclusa, caução facilitada e atendimento direto no WhatsApp com quem resolve.
+              Retirada expressa em 2 minutos, manutenção preventiva 100% inclusa, caução facilitada no PIX e suporte humanizado direto com quem resolve.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
               <button
-                onClick={onOpenContactHub}
-                className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-8 py-3.5 rounded-2xl font-black text-sm transition-all shadow-lg shadow-emerald-500/20 active:scale-95 cursor-pointer"
+                onClick={onOpenDriverAuth || onOpenContactHub}
+                className="w-full sm:w-auto bg-gradient-to-r from-brand-500 via-blue-600 to-brand-500 hover:from-brand-600 hover:to-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
               >
-                📲 Alugar Carro pelo WhatsApp
+                🚀 Quero Alugar / Cadastrar Agora
               </button>
               <button
                 onClick={onGoToDashboard}
-                className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white px-8 py-3.5 rounded-2xl font-bold text-sm border border-slate-700 transition-all cursor-pointer"
+                className="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold text-sm border border-slate-700 hover:border-brand-500/50 transition-all cursor-pointer shadow-md"
               >
-                📊 Acessar Painel do Dono
+                👑 Acessar Painel do Dono
               </button>
             </div>
           </div>
 
           {/* Interactive Uber Earnings Simulator */}
-          <div className="mt-14 max-w-4xl mx-auto bg-slate-900/90 border border-slate-800 p-6 sm:p-8 rounded-3xl shadow-2xl backdrop-blur-md">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-5 mb-6">
+          <div className="mt-14 max-w-4xl mx-auto bg-slate-900/80 border border-slate-800/90 p-6 sm:p-8 rounded-3xl shadow-2xl backdrop-blur-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-800 pb-5 mb-6 relative z-10">
               <div>
-                <span className="text-[10px] font-extrabold text-emerald-400 uppercase tracking-widest block">SIMULADOR DE RENTABILIDADE</span>
+                <span className="text-[10px] font-black text-brand-cyan uppercase tracking-widest block">SIMULADOR DE RENTABILIDADE</span>
                 <h3 className="text-lg font-black text-white">Quanto você pode lucrar rodando com a Cabral Locações?</h3>
               </div>
-              <span className="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700 font-bold self-start">
+              <span className="text-xs bg-brand-500/20 text-brand-cyan px-3 py-1 rounded-full border border-brand-500/30 font-black self-start">
                 MANUTENÇÃO 100% INCLUSA
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center relative z-10">
               <div className="space-y-4">
                 <div>
                   <div className="flex justify-between text-xs font-bold text-slate-300 mb-2">
                     <span>Horas rodadas por dia:</span>
-                    <span className="text-emerald-400 font-black">{simulatorHours} horas/dia</span>
+                    <span className="text-brand-cyan font-black text-sm">{simulatorHours} horas/dia</span>
                   </div>
                   <input
                     type="range"
@@ -82,7 +101,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
                     max="14"
                     value={simulatorHours}
                     onChange={(e) => setSimulatorHours(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                    className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-cyan"
                   />
                 </div>
 
@@ -91,10 +110,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setSimulatorCarType('hatch')}
-                      className={`p-3 rounded-xl text-xs font-bold border transition-all ${
+                      className={`p-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         simulatorCarType === 'hatch'
-                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                          : 'bg-slate-800/60 border-slate-700 text-slate-400'
+                          ? 'bg-brand-500/20 border-brand-500 text-brand-300 shadow-md shadow-brand-500/20'
+                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
                       }`}
                     >
                       🚗 Hatch (Onix/HB20)
@@ -102,10 +121,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
                     </button>
                     <button
                       onClick={() => setSimulatorCarType('sedan')}
-                      className={`p-3 rounded-xl text-xs font-bold border transition-all ${
+                      className={`p-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         simulatorCarType === 'sedan'
-                          ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                          : 'bg-slate-800/60 border-slate-700 text-slate-400'
+                          ? 'bg-brand-500/20 border-brand-500 text-brand-300 shadow-md shadow-brand-500/20'
+                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
                       }`}
                     >
                       🚘 Sedã (Cronos/Onix+)
@@ -116,19 +135,19 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
               </div>
 
               {/* Result Card */}
-              <div className="bg-gradient-to-br from-emerald-950/60 to-slate-900 p-6 rounded-2xl border border-emerald-800/50 space-y-3 text-center sm:text-left">
-                <span className="text-[11px] font-extrabold text-emerald-400 uppercase tracking-wide block">
+              <div className="bg-gradient-to-br from-brand-900/80 via-slate-900 to-slate-950 p-6 rounded-2xl border border-brand-500/30 space-y-3 text-center sm:text-left shadow-lg shadow-brand-500/10">
+                <span className="text-[11px] font-black text-brand-cyan uppercase tracking-wide block">
                   Lucro Líquido Mensal Estimado:
                 </span>
                 <span className="text-3xl sm:text-4xl font-black text-white block">
-                  {formatCurrency(Math.max(2500, estimatedMonthlyNet))}
+                  {formatCurrency(Math.max(2800, estimatedMonthlyNet))}
                 </span>
                 <p className="text-xs text-slate-400 leading-snug">
-                  *Já descontado o valor do aluguel semanal e combustível estimado. Sem custos com seguro, IPVA ou troca de óleo!
+                  *Já descontado o valor da semanalidade e o combustível estimado. Sem custos com seguro, IPVA ou troca de óleo!
                 </p>
                 <button
-                  onClick={onOpenContactHub}
-                  className="w-full mt-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition-all shadow-md active:scale-95"
+                  onClick={onOpenDriverAuth || onOpenContactHub}
+                  className="w-full mt-2 bg-gradient-to-r from-brand-cyan to-brand-400 hover:from-brand-300 hover:to-brand-cyan text-slate-950 font-black py-3 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer uppercase tracking-wider"
                 >
                   Garantir Meu Carro Agora
                 </button>
@@ -142,8 +161,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
       <section className="py-16 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">Nossa Frota Disponível</h2>
-            <p className="text-xs text-slate-400">Veículos revisados semanalmente, prontos para rodar</p>
+            <h2 className="text-2xl font-black text-white tracking-tight font-display">Nossa Frota Disponível</h2>
+            <p className="text-xs text-slate-400">Veículos novos, revisados semanalmente e prontos para rodar</p>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -151,10 +170,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                   selectedCategory === cat
-                    ? 'bg-emerald-500 text-slate-950 font-black'
-                    : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                    ? 'bg-brand-500 text-white font-black shadow-md shadow-brand-500/20'
+                    : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
                 }`}
               >
                 {cat === 'all' ? 'Todos' : cat}
@@ -168,12 +187,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
           {filteredCars.map((car) => (
             <div
               key={car.id}
-              className="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-lg hover:border-slate-700 transition-all flex flex-col justify-between"
+              className="bg-slate-900 border border-slate-800 hover:border-brand-500/50 rounded-3xl overflow-hidden shadow-xl transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="h-44 bg-slate-800 relative overflow-hidden">
-                  <img src={car.photoUrl} alt={car.model} className="w-full h-full object-cover" />
-                  <span className="absolute top-3 right-3 bg-slate-950/80 backdrop-blur-xs text-emerald-400 text-[10px] font-black px-2.5 py-1 rounded-full border border-emerald-500/30">
+                <div className="h-48 bg-slate-950 relative overflow-hidden">
+                  <img src={car.photoUrl} alt={car.model} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <span className="absolute top-3 right-3 bg-brand-dark/90 backdrop-blur-md text-brand-cyan text-[10px] font-black px-3 py-1 rounded-full border border-brand-500/30">
                     {car.category}
                   </span>
                 </div>
@@ -184,7 +203,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
                     <p className="text-xs text-slate-400">Ano {car.year} · {car.color}</p>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 bg-slate-800/60 p-2.5 rounded-xl border border-slate-700/50">
+                  <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
                     <span>❄️ Ar-condicionado</span>
                     <span>🕹️ Câmbio Flex</span>
                     <span>🧳 4 Portas</span>
@@ -195,15 +214,15 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
 
               <div className="p-5 border-t border-slate-800/80 flex items-center justify-between">
                 <div>
-                  <span className="text-[10px] font-bold text-slate-400 uppercase block">A partir de</span>
-                  <span className="text-lg font-black text-emerald-400">{formatCurrency(car.weeklyRate)}<span className="text-xs text-slate-400 font-normal">/sem</span></span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase block">Semanalidade</span>
+                  <span className="text-lg font-black text-brand-cyan">{formatCurrency(car.weeklyRate)}<span className="text-xs text-slate-400 font-normal">/sem</span></span>
                 </div>
 
                 <button
                   onClick={onOpenContactHub}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-extrabold transition-all active:scale-95"
+                  className="bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer shadow-md shadow-brand-500/20"
                 >
-                  Alugar Agora
+                  Alugar Carro
                 </button>
               </div>
             </div>
@@ -212,35 +231,35 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
       </section>
 
       {/* Differentiators Section */}
-      <section className="py-16 bg-slate-900 border-t border-slate-800">
+      <section className="py-16 bg-slate-900/70 border-t border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-12">
           <div>
-            <h2 className="text-2xl font-black text-white tracking-tight">Por que alugar na Cabral Locações?</h2>
+            <h2 className="text-2xl font-black text-white tracking-tight font-display">Por que alugar na Cabral Locações?</h2>
             <p className="text-xs text-slate-400 max-w-xl mx-auto mt-1">
               Diga adeus às filas intermináveis e cobranças injustas das grandes locadoras
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
-            <div className="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl space-y-2">
+            <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
               <span className="text-2xl">⚡</span>
               <h3 className="text-sm font-extrabold text-white">Retirada em 2 Minutos</h3>
               <p className="text-xs text-slate-400">Contrato assinado pelo celular antes de sair de casa. Sem filas no balcão.</p>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl space-y-2">
+            <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
               <span className="text-2xl">💸</span>
               <h3 className="text-sm font-extrabold text-white">Caução Facilitada</h3>
               <p className="text-xs text-slate-400">Devolução instantânea no PIX no ato da entrega do veículo, sem prender seu cartão.</p>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl space-y-2">
+            <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
               <span className="text-2xl">🛢️</span>
               <h3 className="text-sm font-extrabold text-white">Manutenção 100% Inclusa</h3>
               <p className="text-xs text-slate-400">Troca de óleo, pastilhas de freio e pneus cobertos pela locadora sem custos extras.</p>
             </div>
 
-            <div className="bg-slate-950/60 border border-slate-800 p-5 rounded-2xl space-y-2">
+            <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
               <span className="text-2xl">🤝</span>
               <h3 className="text-sm font-extrabold text-white">Atendimento Humanizado</h3>
               <p className="text-xs text-slate-400">Fale direto com a nossa equipe no WhatsApp, com respostas rápidas e sem robôs de 0800.</p>
@@ -250,9 +269,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({ onOpenCont
       </section>
 
       {/* Footer */}
-      <footer className="py-8 bg-slate-950 border-t border-slate-800 text-center text-xs text-slate-500">
+      <footer className="py-10 bg-brand-dark border-t border-slate-800 text-center text-xs text-slate-500 space-y-3">
+        <div className="flex justify-center">
+          <BrandLogo size="md" />
+        </div>
         <p className="font-extrabold text-slate-400">CABRAL LOCAÇÕES DE VEÍCULOS LTDA</p>
-        <p className="mt-1">Locação para Motoristas de Aplicativo e Frotas Comerciais · Atendimento direto pelo WhatsApp</p>
+        <p className="max-w-md mx-auto">Locação Especializada para Motoristas de Aplicativo (Uber, 99) e Frotas Comerciais.</p>
       </footer>
     </div>
   );
