@@ -7,6 +7,7 @@ import { AiCopilotAndInsights } from './components/AiCopilotAndInsights';
 import { FleetTableWithExport } from './components/FleetTableWithExport';
 import { RentalManagement } from './components/RentalManagement';
 import { AddVehicleModal } from './components/AddVehicleModal';
+import { EditVehicleModal } from './components/EditVehicleModal';
 import { SettingsModal } from './components/SettingsModal';
 import { DriverPortal } from './components/DriverPortal';
 import { ContactHubModal } from './components/ContactHubModal';
@@ -42,6 +43,8 @@ export const App: React.FC = () => {
   const [authModalInitialRole, setAuthModalInitialRole] = useState<'admin' | 'driver'>('driver');
   const [isContactHubOpen, setIsContactHubOpen] = useState(false);
   const [isAddVehicleOpen, setIsAddVehicleOpen] = useState(false);
+  const [isEditVehicleOpen, setIsEditVehicleOpen] = useState(false);
+  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   // Global State for Vehicles, Contracts, Past Rentals, Maintenance Rules and Settings
@@ -51,9 +54,14 @@ export const App: React.FC = () => {
   const [maintenanceRules, setMaintenanceRules] = useState<MaintenanceRule[]>(mockMaintenanceRules);
   const [settings, setSettings] = useState<AppSettings>(defaultAppSettings);
 
-  // Load saved profile & settings from localStorage
+  // Load saved profile, vehicles & settings from localStorage
   useEffect(() => {
     try {
+      const savedVehicles = localStorage.getItem('cabral_vehicles');
+      if (savedVehicles) {
+        setVehicles(JSON.parse(savedVehicles));
+      }
+
       const saved = localStorage.getItem('cabral_user_profile');
       if (saved) {
         const parsed = JSON.parse(saved) as UserProfile;
@@ -73,6 +81,16 @@ export const App: React.FC = () => {
       // ignore
     }
   }, []);
+
+  // Helper to persist vehicles to localStorage
+  const persistVehicles = (updatedVehicles: Vehicle[]) => {
+    setVehicles(updatedVehicles);
+    try {
+      localStorage.setItem('cabral_vehicles', JSON.stringify(updatedVehicles));
+    } catch {
+      // ignore
+    }
+  };
 
   // Sync theme with HTML root class
   useEffect(() => {
@@ -124,10 +142,31 @@ export const App: React.FC = () => {
 
   // Add new vehicle to fleet & inventory
   const handleAddVehicle = (newVehicle: Vehicle) => {
-    setVehicles(prev => [newVehicle, ...prev]);
+    const updated = [newVehicle, ...vehicles];
+    persistVehicles(updated);
     sendPushNotification(
       '🚗 Novo Carro Cadastrado!',
       `${newVehicle.model} (${newVehicle.plate}) foi adicionado ao estoque da Cabral Locações.`
+    );
+  };
+
+  // Edit existing vehicle
+  const handleSaveEditedVehicle = (updatedVehicle: Vehicle) => {
+    const updated = vehicles.map(v => v.id === updatedVehicle.id ? updatedVehicle : v);
+    persistVehicles(updated);
+    sendPushNotification(
+      '✏️ Veículo Atualizado!',
+      `${updatedVehicle.model} (${updatedVehicle.plate}) foi atualizado com sucesso.`
+    );
+  };
+
+  // Delete vehicle from inventory
+  const handleDeleteVehicle = (vehicleId: string) => {
+    const updated = vehicles.filter(v => v.id !== vehicleId);
+    persistVehicles(updated);
+    sendPushNotification(
+      '🗑️ Veículo Removido',
+      'Veículo removido do estoque da Cabral Locações.'
     );
   };
 
@@ -268,6 +307,7 @@ export const App: React.FC = () => {
             }}
             onOpenDriverAuth={() => handleOpenAuth('driver')}
             theme={settings.theme}
+            vehicles={vehicles}
           />
         )}
 
@@ -299,6 +339,10 @@ export const App: React.FC = () => {
               vehicles={vehicles}
               onOpenAddVehicle={() => setIsAddVehicleOpen(true)}
               onUpdateVehicleKm={handleUpdateOdometer}
+              onEditVehicle={(vehicle) => {
+                setEditingVehicle(vehicle);
+                setIsEditVehicleOpen(true);
+              }}
             />
           </div>
         )}
@@ -344,11 +388,24 @@ export const App: React.FC = () => {
         onAddVehicle={handleAddVehicle}
       />
 
+      <EditVehicleModal
+        isOpen={isEditVehicleOpen}
+        onClose={() => {
+          setIsEditVehicleOpen(false);
+          setEditingVehicle(null);
+        }}
+        vehicle={editingVehicle}
+        onSaveVehicle={handleSaveEditedVehicle}
+        onDeleteVehicle={handleDeleteVehicle}
+      />
+
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSettings={handleUpdateSettings}
+        isAdmin={isAdminAuthenticated || userProfile?.role === 'admin'}
+        onOpenAdminAuth={() => handleOpenAuth('admin')}
       />
     </div>
   );

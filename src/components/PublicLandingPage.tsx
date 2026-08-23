@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { Vehicle } from '../types/fleet';
 import { mockVehicles } from '../lib/mock-data';
 import { formatCurrency } from '../lib/utils/calculations';
 import { BrandLogo } from './BrandLogo';
@@ -17,13 +18,153 @@ interface PublicLandingPageProps {
   onGoToDashboard: () => void;
   onOpenDriverAuth?: () => void;
   theme?: 'dark' | 'light';
+  vehicles?: Vehicle[];
 }
+
+interface VehicleCardProps {
+  car: Vehicle;
+  isLight: boolean;
+  onOpenContactHub: () => void;
+}
+
+const VehicleCardWithGallery: React.FC<VehicleCardProps> = ({ car, isLight, onOpenContactHub }) => {
+  const photoList = useMemo(() => {
+    if (car.photos && car.photos.length > 0) return car.photos;
+    if (car.photoUrl) return [car.photoUrl];
+    return ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&auto=format&fit=crop&q=60'];
+  }, [car.photos, car.photoUrl]);
+
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+
+  const handlePrevPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActivePhotoIdx((prev) => (prev > 0 ? prev - 1 : photoList.length - 1));
+  };
+
+  const handleNextPhoto = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActivePhotoIdx((prev) => (prev < photoList.length - 1 ? prev + 1 : 0));
+  };
+
+  return (
+    <div
+      className={`border rounded-3xl overflow-hidden shadow-md transition-all flex flex-col justify-between group ${
+        isLight 
+          ? 'bg-white border-slate-200' 
+          : 'bg-slate-900 border-slate-800 hover:border-brand-500/50 shadow-xl'
+      }`}
+    >
+      <div>
+        {/* Photo Container with Gallery Navigation */}
+        <div className={`h-48 relative overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-950'}`}>
+          <img
+            src={photoList[activePhotoIdx]}
+            alt={`${car.model} - foto ${activePhotoIdx + 1}`}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          />
+
+          {/* Category Badge */}
+          <span className={`absolute top-3 right-3 backdrop-blur-md text-[10px] font-black px-3 py-1 rounded-full border shadow-sm ${
+            isLight 
+              ? 'bg-white/90 text-blue-700 border-blue-200' 
+              : 'bg-brand-dark/90 text-brand-cyan border-brand-500/30'
+          }`}>
+            {car.category}
+          </span>
+
+          {/* Gallery Controls (if more than 1 photo) */}
+          {photoList.length > 1 && (
+            <>
+              <button
+                onClick={handlePrevPhoto}
+                className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center text-xs font-black shadow-md cursor-pointer transition-all active:scale-95"
+                title="Foto Anterior"
+              >
+                ‹
+              </button>
+              <button
+                onClick={handleNextPhoto}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center text-xs font-black shadow-md cursor-pointer transition-all active:scale-95"
+                title="Próxima Foto"
+              >
+                ›
+              </button>
+              
+              {/* Photo Dots Indicator */}
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center space-x-1.5 bg-black/50 px-2 py-1 rounded-full">
+                {photoList.map((_: string, dotIdx: number) => (
+                  <button
+                    key={dotIdx}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActivePhotoIdx(dotIdx);
+                    }}
+                    className={`w-1.5 h-1.5 rounded-full transition-all cursor-pointer ${
+                      activePhotoIdx === dotIdx ? 'bg-brand-cyan w-3' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="p-5 space-y-3">
+          <div>
+            <div className="flex items-center justify-between">
+              <h3 className={`text-base font-extrabold ${isLight ? 'text-slate-900' : 'text-white'}`}>{car.model}</h3>
+              {photoList.length > 1 && (
+                <span className="text-[10px] font-bold text-brand-cyan bg-brand-500/10 px-2 py-0.5 rounded-full border border-brand-500/20">
+                  📸 {photoList.length} fotos
+                </span>
+              )}
+            </div>
+            <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Ano {car.year} · {car.color || 'Prata'}</p>
+          </div>
+
+          <div className={`grid grid-cols-2 gap-2 text-[11px] p-3 rounded-xl border ${
+            isLight 
+              ? 'bg-slate-50 border-slate-200 text-slate-700' 
+              : 'bg-slate-950/70 border-slate-800/80 text-slate-300'
+          }`}>
+            <span>❄️ Ar-condicionado</span>
+            <span>🕹️ Câmbio Flex</span>
+            <span>🧳 4 Portas</span>
+            <span>🛡️ Seguro 24h</span>
+          </div>
+        </div>
+      </div>
+
+      <div className={`p-5 border-t flex items-center justify-between ${
+        isLight ? 'border-slate-100' : 'border-slate-800/80'
+      }`}>
+        <div>
+          <span className={`text-[10px] font-bold uppercase block ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+            Semanalidade
+          </span>
+          <span className={`text-lg font-black ${isLight ? 'text-blue-700' : 'text-brand-cyan'}`}>
+            {formatCurrency(car.weeklyRate)}
+          </span>
+        </div>
+        <button
+          onClick={onOpenContactHub}
+          className="bg-brand-500 hover:bg-brand-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-md transition-all active:scale-95 cursor-pointer font-display uppercase tracking-wider"
+        >
+          Alugar Agora
+        </button>
+      </div>
+    </div>
+  );
+};
 
 export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   onOpenContactHub,
   onGoToDashboard,
   onOpenDriverAuth,
-  theme = 'dark'
+  theme = 'dark',
+  vehicles
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'Hatch' | 'Sedan' | 'SUV'>('all');
   const [simulatorHours, setSimulatorHours] = useState(8);
@@ -33,6 +174,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   const [brandIndex, setBrandIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
   const isLight = theme === 'light';
+
+  const allVehicles = useMemo(() => vehicles && vehicles.length > 0 ? vehicles : mockVehicles, [vehicles]);
 
   const brandOptions = useMemo(() => [
     {
@@ -95,10 +238,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   }, [brandOptions.length]);
 
   const filteredCars = useMemo(() => {
-    return mockVehicles.filter(v => 
+    return allVehicles.filter(v => 
       selectedCategory === 'all' || v.category === selectedCategory
     );
-  }, [selectedCategory]);
+  }, [allVehicles, selectedCategory]);
 
   // Estimator logic memoized for 60fps slider performance
   const { weeklyRentalCost, estimatedMonthlyGross, estimatedMonthlyNet } = useMemo(() => {
@@ -345,73 +488,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
         {/* Cars Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {filteredCars.map((car) => (
-            <div
+            <VehicleCardWithGallery
               key={car.id}
-              className={`border rounded-3xl overflow-hidden shadow-md transition-all flex flex-col justify-between group ${
-                isLight 
-                  ? 'bg-white border-slate-200' 
-                  : 'bg-slate-900 border-slate-800 hover:border-brand-500/50 shadow-xl'
-              }`}
-            >
-              <div>
-                <div className={`h-48 relative overflow-hidden ${isLight ? 'bg-slate-100' : 'bg-slate-950'}`}>
-                  <img
-                    src={car.photoUrl}
-                    alt={car.model}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <span className={`absolute top-3 right-3 backdrop-blur-md text-[10px] font-black px-3 py-1 rounded-full border ${
-                    isLight 
-                      ? 'bg-white/90 text-blue-700 border-blue-200' 
-                      : 'bg-brand-dark/90 text-brand-cyan border-brand-500/30'
-                  }`}>
-                    {car.category}
-                  </span>
-                </div>
-
-                <div className="p-5 space-y-3">
-                  <div>
-                    <h3 className={`text-base font-extrabold ${isLight ? 'text-slate-900' : 'text-white'}`}>{car.model}</h3>
-                    <p className={`text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>Ano {car.year} · {car.color}</p>
-                  </div>
-
-                  <div className={`grid grid-cols-2 gap-2 text-[11px] p-3 rounded-xl border ${
-                    isLight 
-                      ? 'bg-slate-50 border-slate-200 text-slate-700' 
-                      : 'bg-slate-950/70 border-slate-800/80 text-slate-300'
-                  }`}>
-                    <span>❄️ Ar-condicionado</span>
-                    <span>🕹️ Câmbio Flex</span>
-                    <span>🧳 4 Portas</span>
-                    <span>🛡️ Seguro 24h</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className={`p-5 border-t flex items-center justify-between ${
-                isLight ? 'border-slate-100' : 'border-slate-800/80'
-              }`}>
-                <div>
-                  <span className={`text-[10px] font-bold uppercase block ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-                    Semanalidade
-                  </span>
-                  <span className={`text-lg font-black ${isLight ? 'text-blue-700' : 'text-brand-cyan'}`}>
-                    {formatCurrency(car.weeklyRate)}
-                    <span className={`text-xs font-normal ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>/sem</span>
-                  </span>
-                </div>
-
-                <button
-                  onClick={onOpenContactHub}
-                  className="flex items-center space-x-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer shadow-md shadow-[#25D366]/20"
-                >
-                  <WhatsAppIcon className="w-3.5 h-3.5 fill-white" />
-                  <span>Alugar Agora</span>
-                </button>
-              </div>
-            </div>
+              car={car}
+              isLight={isLight}
+              onOpenContactHub={onOpenContactHub}
+            />
           ))}
         </div>
       </section>

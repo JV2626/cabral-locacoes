@@ -14,12 +14,14 @@ interface FleetTableWithExportProps {
   vehicles?: Vehicle[];
   onOpenAddVehicle?: () => void;
   onUpdateVehicleKm?: (plate: string, km: number) => void;
+  onEditVehicle?: (vehicle: Vehicle) => void;
 }
 
 export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
   vehicles = [],
   onOpenAddVehicle,
-  onUpdateVehicleKm
+  onUpdateVehicleKm,
+  onEditVehicle
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -51,7 +53,7 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
           </div>
           <div>
             <h1 className="text-2xl font-black text-white tracking-tight font-display">Gestão da Frota & Estoque</h1>
-            <p className="text-xs text-slate-400 font-medium">Controle de {vehicles.length} veículos, odômetros e exportação de relatórios</p>
+            <p className="text-xs text-slate-400 font-medium">Controle de {vehicles.length} veículos, fotos, odômetros e exportação de relatórios</p>
           </div>
         </div>
 
@@ -115,6 +117,7 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
                 <th className="py-4 px-5">Status</th>
                 <th className="py-4 px-5">Motorista Ativo</th>
                 <th className="py-4 px-5 text-right">Semanalidade</th>
+                <th className="py-4 px-5 text-center">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60 text-xs font-medium">
@@ -122,12 +125,17 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
                 <tr key={vehicle.id} className="hover:bg-slate-800/40 transition-colors">
                   <td className="py-4 px-5">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-950 overflow-hidden shrink-0 border border-slate-800">
+                      <div className="w-12 h-10 rounded-xl bg-slate-950 overflow-hidden shrink-0 border border-slate-800 relative group">
                         <img src={vehicle.photoUrl} alt={vehicle.model} className="w-full h-full object-cover" />
+                        {vehicle.photos && vehicle.photos.length > 1 && (
+                          <span className="absolute bottom-0 right-0 bg-brand-500 text-white text-[8px] font-black px-1 rounded-tl">
+                            +{vehicle.photos.length}
+                          </span>
+                        )}
                       </div>
                       <div>
                         <span className="font-black text-white block leading-tight">{vehicle.model}</span>
-                        <span className="text-[11px] font-mono text-slate-400">{vehicle.plate} · {vehicle.year}</span>
+                        <span className="text-[11px] font-mono text-slate-400">{vehicle.plate} · {vehicle.year} · {vehicle.color || 'Prata'}</span>
                       </div>
                     </div>
                   </td>
@@ -197,6 +205,17 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
                   </td>
                   <td className="py-4 px-5 text-right font-black text-brand-cyan">
                     {formatCurrency(vehicle.weeklyRate)}
+                  </td>
+                  <td className="py-4 px-5 text-center">
+                    {onEditVehicle && (
+                      <button
+                        onClick={() => onEditVehicle(vehicle)}
+                        className="bg-slate-950 hover:bg-brand-500/20 border border-slate-700 hover:border-brand-500/40 text-slate-200 hover:text-brand-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
+                        title="Editar Veículo e Fotos"
+                      >
+                        ✏️ Editar
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}

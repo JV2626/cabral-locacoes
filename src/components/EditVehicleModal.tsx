@@ -1,38 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Vehicle, VehicleCategory, VehicleStatus } from '../types/fleet';
-import { BrandLogo } from './BrandLogo';
 import { CarIcon } from './Icons';
 
-interface AddVehicleModalProps {
+interface EditVehicleModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddVehicle: (newVehicle: Vehicle) => void;
+  vehicle: Vehicle | null;
+  onSaveVehicle: (updatedVehicle: Vehicle) => void;
+  onDeleteVehicle?: (vehicleId: string) => void;
 }
 
-export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
+export const EditVehicleModal: React.FC<EditVehicleModalProps> = ({
   isOpen,
   onClose,
-  onAddVehicle
+  vehicle,
+  onSaveVehicle,
+  onDeleteVehicle
 }) => {
   const [model, setModel] = useState('');
   const [plate, setPlate] = useState('');
   const [category, setCategory] = useState<VehicleCategory>('Hatch');
   const [year, setYear] = useState(2024);
-  const [color, setColor] = useState('Prata');
+  const [color, setColor] = useState('');
   const [currentKm, setCurrentKm] = useState(0);
   const [weeklyRate, setWeeklyRate] = useState(490);
   const [dailyRate, setDailyRate] = useState(95);
   const [status, setStatus] = useState<VehicleStatus>('available');
+  const [currentDriver, setCurrentDriver] = useState('');
+  
   // Multiple Photos Management
-  const [photoUrl, setPhotoUrl] = useState(
-    'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&auto=format&fit=crop&q=60'
-  );
-  const [photos, setPhotos] = useState<string[]>([
-    'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&auto=format&fit=crop&q=60'
-  ]);
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [photos, setPhotos] = useState<string[]>([]);
   const [newPhotoInput, setNewPhotoInput] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (vehicle) {
+      setModel(vehicle.model);
+      setPlate(vehicle.plate);
+      setCategory(vehicle.category);
+      setYear(vehicle.year);
+      setColor(vehicle.color || 'Prata');
+      setCurrentKm(vehicle.currentKm);
+      setWeeklyRate(vehicle.weeklyRate);
+      setDailyRate(vehicle.dailyRate || Math.round(vehicle.weeklyRate / 5.5));
+      setStatus(vehicle.status);
+      setCurrentDriver(vehicle.currentDriver || '');
+      setPhotoUrl(vehicle.photoUrl || '');
+      setPhotos(vehicle.photos && vehicle.photos.length > 0 ? vehicle.photos : vehicle.photoUrl ? [vehicle.photoUrl] : []);
+      setConfirmDelete(false);
+    }
+  }, [vehicle]);
+
+  if (!isOpen || !vehicle) return null;
 
   const handleAddPhotoUrl = () => {
     if (!newPhotoInput.trim()) return;
@@ -70,14 +90,14 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!model.trim() || !plate.trim()) {
-      alert('Preencha os campos obrigatórios (Modelo e Placa).');
+      alert('Modelo e Placa são obrigatórios.');
       return;
     }
 
     const mainPhoto = photos[0] || photoUrl || 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=800&auto=format&fit=crop&q=60';
 
-    const newVehicle: Vehicle = {
-      id: `veh-${Date.now()}`,
+    const updated: Vehicle = {
+      ...vehicle,
       model: model.trim(),
       plate: plate.trim().toUpperCase(),
       category,
@@ -87,17 +107,25 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
       weeklyRate: Number(weeklyRate),
       dailyRate: Number(dailyRate),
       status,
+      currentDriver: currentDriver.trim() || undefined,
       photoUrl: mainPhoto,
       photos: photos.length > 0 ? photos : [mainPhoto]
     };
 
-    onAddVehicle(newVehicle);
+    onSaveVehicle(updated);
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (onDeleteVehicle && vehicle) {
+      onDeleteVehicle(vehicle.id);
+      onClose();
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-in fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden text-white">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden text-white">
         
         {/* Modal Header */}
         <div className="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-900 p-6 relative border-b border-slate-800 flex items-center justify-between">
@@ -106,8 +134,8 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
               <CarIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-black text-white font-display">Cadastrar Novo Veículo no Estoque</h3>
-              <p className="text-xs text-slate-400">Adicione carros para aluguel imediato na frota</p>
+              <h3 className="text-base font-black text-white font-display">Editar Veículo da Frota</h3>
+              <p className="text-xs text-slate-400">Atualize informações, fotos e status do veículo</p>
             </div>
           </div>
           <button
@@ -119,14 +147,15 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+          
+          {/* Row 1: Model & Plate */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">Modelo do Carro *</label>
               <input
                 type="text"
                 required
-                placeholder="Ex: Fiat Cronos 1.3 Drive"
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3.5 py-2.5 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-500 focus:outline-none"
@@ -138,7 +167,6 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
               <input
                 type="text"
                 required
-                placeholder="Ex: BRA-2026"
                 value={plate}
                 onChange={(e) => setPlate(e.target.value.toUpperCase())}
                 className="w-full bg-slate-950 border border-slate-700 text-xs font-mono font-bold rounded-xl px-3.5 py-2.5 text-brand-cyan placeholder-slate-500 focus:ring-2 focus:ring-brand-500 focus:outline-none uppercase"
@@ -146,6 +174,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
             </div>
           </div>
 
+          {/* Row 2: Category, Year, Color */}
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">Categoria</label>
@@ -178,12 +207,12 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
                 type="text"
                 value={color}
                 onChange={(e) => setColor(e.target.value)}
-                placeholder="Prata / Branco"
                 className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3 py-2.5 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none"
               />
             </div>
           </div>
 
+          {/* Row 3: Current KM, Rates, Status */}
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">KM Atual</label>
@@ -191,8 +220,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
                 type="number"
                 value={currentKm}
                 onChange={(e) => setCurrentKm(Number(e.target.value))}
-                placeholder="0"
-                className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3 py-2.5 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3 py-2.5 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono"
               />
             </div>
 
@@ -202,39 +230,51 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
                 type="number"
                 value={weeklyRate}
                 onChange={(e) => setWeeklyRate(Number(e.target.value))}
-                placeholder="490"
                 className="w-full bg-slate-950 border border-slate-700 text-xs font-bold text-brand-cyan rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 focus:outline-none"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Status Inicial</label>
+              <label className="text-xs font-bold text-slate-300 block mb-1">Status</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value as VehicleStatus)}
                 className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-2 py-2.5 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
               >
-                <option value="available">Disponível</option>
-                <option value="rented">Em Locação</option>
-                <option value="maintenance">Em Manutenção</option>
+                <option value="available">🟢 Disponível</option>
+                <option value="rented">🔑 Em Locação</option>
+                <option value="maintenance">🔧 Em Manutenção</option>
+                <option value="inactive">⚪ Inativo</option>
               </select>
             </div>
           </div>
 
+          {/* Motorista Vinculado */}
+          <div>
+            <label className="text-xs font-bold text-slate-300 block mb-1">Motorista Ativo (opcional)</label>
+            <input
+              type="text"
+              value={currentDriver}
+              onChange={(e) => setCurrentDriver(e.target.value)}
+              placeholder="Ex: Carlos Eduardo dos Santos"
+              className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3.5 py-2 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-500 focus:outline-none"
+            />
+          </div>
+
           {/* 📸 Múltiplas Fotos do Veículo */}
-          <div className="space-y-3 border-t border-slate-800 pt-3">
+          <div className="space-y-3 border-t border-slate-800 pt-4">
             <div className="flex items-center justify-between">
               <label className="text-xs font-black text-brand-cyan uppercase tracking-wider block">
-                📸 Fotos do Veículo ({photos.length} adicionadas)
+                📸 Galeria de Fotos do Veículo ({photos.length} fotos)
               </label>
-              <span className="text-[10px] text-slate-400">Frente, Lados, Traseira, Interior</span>
+              <span className="text-[10px] text-slate-400">Frente, Laterais, Traseira e Interior</span>
             </div>
 
             {/* Existing Photos Grid */}
             {photos.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {photos.map((url, idx) => (
-                  <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 h-20">
+                  <div key={idx} className="relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 h-24">
                     <img src={url} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
                     <span className="absolute bottom-1 left-1 bg-black/70 text-[9px] font-bold text-white px-1.5 py-0.5 rounded">
                       {idx === 0 ? '⭐ Principal' : `Foto #${idx + 1}`}
@@ -242,7 +282,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
                     <button
                       type="button"
                       onClick={() => handleRemovePhoto(idx)}
-                      className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-600/90 text-white flex items-center justify-center text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      className="absolute top-1 right-1 w-6 h-6 rounded-full bg-rose-600/90 text-white flex items-center justify-center text-[10px] font-black opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                       title="Remover Foto"
                     >
                       ✕
@@ -253,11 +293,13 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
             )}
 
             {/* Add Photo Controls */}
-            <div className="bg-slate-950 p-3 rounded-2xl border border-slate-800 space-y-2">
+            <div className="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 space-y-2.5">
+              <span className="text-[11px] font-bold text-slate-300 block">Adicionar mais fotos:</span>
+              
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
                   type="text"
-                  placeholder="Cole o link (URL) da foto..."
+                  placeholder="Cole o link (URL) da imagem..."
                   value={newPhotoInput}
                   onChange={(e) => setNewPhotoInput(e.target.value)}
                   className="flex-1 bg-slate-900 border border-slate-700 text-xs rounded-xl px-3 py-2 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-500 focus:outline-none"
@@ -265,15 +307,15 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
                 <button
                   type="button"
                   onClick={handleAddPhotoUrl}
-                  className="bg-brand-500 hover:bg-brand-600 text-white font-bold px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer shrink-0"
+                  className="bg-brand-500 hover:bg-brand-600 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors cursor-pointer shrink-0"
                 >
-                  + Link
+                  + Inserir Link
                 </button>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <label className="flex-1 flex items-center justify-center space-x-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white px-3 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer">
-                  <span>📁 Enviar Foto do Celular / PC</span>
+              <div className="flex items-center space-x-2 pt-1">
+                <label className="flex-1 flex items-center justify-center space-x-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer">
+                  <span>📁 Enviar Foto do Dispositivo (Galeria/Câmera)</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -286,6 +328,42 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
             </div>
           </div>
 
+          {/* Danger Zone: Delete Vehicle */}
+          {onDeleteVehicle && (
+            <div className="border-t border-slate-800 pt-3">
+              {confirmDelete ? (
+                <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center justify-between">
+                  <span className="text-xs font-bold text-rose-300">Tem certeza que deseja excluir este carro?</span>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={handleDelete}
+                      className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-black px-3 py-1.5 rounded-xl cursor-pointer"
+                    >
+                      Sim, Excluir
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(false)}
+                      className="bg-slate-800 text-slate-300 text-xs font-bold px-3 py-1.5 rounded-xl cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-xs font-bold text-rose-400 hover:text-rose-300 cursor-pointer flex items-center space-x-1"
+                >
+                  <span>🗑️ Excluir Veículo do Estoque</span>
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Action Buttons */}
           <div className="pt-2 flex items-center justify-end space-x-3 border-t border-slate-800">
             <button
               type="button"
@@ -298,7 +376,7 @@ export const AddVehicleModal: React.FC<AddVehicleModalProps> = ({
               type="submit"
               className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
             >
-              Adicionar ao Estoque
+              Salvar Alterações
             </button>
           </div>
         </form>

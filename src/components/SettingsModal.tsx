@@ -9,13 +9,17 @@ interface SettingsModalProps {
   onClose: () => void;
   settings: AppSettings;
   onUpdateSettings: (newSettings: AppSettings) => void;
+  isAdmin?: boolean;
+  onOpenAdminAuth?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   settings,
-  onUpdateSettings
+  onUpdateSettings,
+  isAdmin = false,
+  onOpenAdminAuth
 }) => {
   const [theme, setTheme] = useState<ThemeMode>(settings.theme);
   const [companyName, setCompanyName] = useState(settings.companyName);
@@ -73,9 +77,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     onUpdateSettings({
       ...settings,
       theme,
-      companyName,
-      pixKey,
-      whatsappPhone
+      companyName: isAdmin ? companyName : settings.companyName,
+      pixKey: isAdmin ? pixKey : settings.pixKey,
+      whatsappPhone: isAdmin ? whatsappPhone : settings.whatsappPhone
     });
     onClose();
   };
@@ -85,9 +89,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden text-white">
         
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-brand-900 via-slate-900 to-brand-900 p-6 relative border-b border-slate-800 flex items-center justify-between">
+        <div className="bg-slate-950 p-6 relative border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <BrandLogo size="sm" />
+            <BrandLogo size="sm" theme="dark" />
             <div>
               <h3 className="text-base font-black text-white font-display">Configurações do Sistema</h3>
               <p className="text-xs text-slate-400">Personalização, Temas e Permissões de Dispositivo</p>
@@ -215,40 +219,92 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             )}
           </div>
 
-          {/* 3. Company Settings */}
+          {/* 3. Company Settings (Protected by Admin Role) */}
           <div className="space-y-3 border-t border-slate-800 pt-4">
-            <label className="text-xs font-black text-brand-cyan uppercase tracking-wider block">
-              🏢 Dados Oficiais da Cabral Locações
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-black text-brand-cyan uppercase tracking-wider block">
+                🏢 Dados Oficiais da Cabral Locações
+              </label>
+              {isAdmin ? (
+                <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
+                  <span>🛡️</span>
+                  <span>Admin Verificado</span>
+                </span>
+              ) : (
+                <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
+                  <span>🔒</span>
+                  <span>Protegido (Somente Admin)</span>
+                </span>
+              )}
+            </div>
+
+            {!isAdmin && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl space-y-2">
+                <p className="text-[11px] text-amber-200 leading-snug">
+                  🔒 <strong>Segurança Ativa:</strong> A Chave PIX e o WhatsApp Oficial são dados financeiros sensíveis e só podem ser alterados por um administrador autorizado da Cabral Locações.
+                </p>
+                {onOpenAdminAuth && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenAdminAuth();
+                    }}
+                    className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2 rounded-xl text-xs transition-colors cursor-pointer"
+                  >
+                    🔑 Entrar como Administrador para Editar PIX
+                  </button>
+                )}
+              </div>
+            )}
 
             <div>
               <label className="text-xs font-bold text-slate-300 block mb-1">Razão Social / Nome Fantasia</label>
               <input
                 type="text"
+                disabled={!isAdmin}
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3.5 py-2.5 text-white"
+                className={`w-full border text-xs rounded-xl px-3.5 py-2.5 text-white ${
+                  isAdmin 
+                    ? 'bg-slate-950 border-slate-700 focus:ring-2 focus:ring-brand-500' 
+                    : 'bg-slate-950/50 border-slate-800 opacity-75 cursor-not-allowed'
+                }`}
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">Chave PIX da Locadora</label>
+                <label className="text-xs font-bold text-slate-300 block mb-1">
+                  Chave PIX da Locadora {!isAdmin && '🔒'}
+                </label>
                 <input
                   type="text"
+                  disabled={!isAdmin}
                   value={pixKey}
                   onChange={(e) => setPixKey(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3 py-2 text-white font-mono"
+                  className={`w-full border text-xs rounded-xl px-3 py-2 font-mono ${
+                    isAdmin 
+                      ? 'bg-slate-950 border-slate-700 text-white focus:ring-2 focus:ring-brand-500' 
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 opacity-75 cursor-not-allowed'
+                  }`}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">WhatsApp Oficial</label>
+                <label className="text-xs font-bold text-slate-300 block mb-1">
+                  WhatsApp Oficial {!isAdmin && '🔒'}
+                </label>
                 <input
                   type="text"
+                  disabled={!isAdmin}
                   value={whatsappPhone}
                   onChange={(e) => setWhatsappPhone(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 text-xs rounded-xl px-3 py-2 text-brand-cyan font-mono font-bold"
+                  className={`w-full border text-xs rounded-xl px-3 py-2 font-mono font-bold ${
+                    isAdmin 
+                      ? 'bg-slate-950 border-slate-700 text-brand-cyan focus:ring-2 focus:ring-brand-500' 
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 opacity-75 cursor-not-allowed'
+                  }`}
                 />
               </div>
             </div>

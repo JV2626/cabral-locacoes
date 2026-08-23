@@ -25,6 +25,7 @@ export interface Vehicle {
   currentKm: number;
   status: VehicleStatus;
   photoUrl: string;
+  photos?: string[]; // Array of vehicle photos (front, sides, rear, interior)
   dailyRate: number;
   weeklyRate: number;
   currentDriver?: string;
