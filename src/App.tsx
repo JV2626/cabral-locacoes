@@ -267,6 +267,7 @@ export const App: React.FC = () => {
               }
             }}
             onOpenDriverAuth={() => handleOpenAuth('driver')}
+            theme={settings.theme}
           />
         )}
 

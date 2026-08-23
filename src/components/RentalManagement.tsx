@@ -210,11 +210,14 @@ export const RentalManagement: React.FC<RentalManagementProps> = ({
                       className="w-14 h-10 object-cover rounded-xl border border-slate-700"
                     />
                     <div>
-                      <h5 className="text-xs font-bold text-white">{vehicle.model}</h5>
-                      <span className="text-[11px] font-mono font-black text-brand-cyan bg-brand-900/60 px-1.5 py-0.5 rounded-md border border-brand-500/30">
+                      <h5 className="text-xs font-bold text-slate-900 dark:text-white">{vehicle.model}</h5>
+                      <span
+                        style={{ color: '#ffffff', backgroundColor: '#0284c7' }}
+                        className="text-[11px] font-mono font-black px-2 py-0.5 rounded-md border border-sky-600 shadow-sm inline-block my-0.5"
+                      >
                         {vehicle.plate}
                       </span>
-                      <span className="text-[11px] text-slate-400 ml-2">Odômetro: {formatKm(vehicle.currentKm)}</span>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-2">Odômetro: {formatKm(vehicle.currentKm)}</span>
                     </div>
                   </div>
 
