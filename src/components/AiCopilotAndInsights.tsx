@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { mockAiInsights, mockVehicles, mockContracts } from '../lib/mock-data';
 import { formatKm, formatCurrency } from '../lib/utils/calculations';
+import {
+  SparklesIcon,
+  CarIcon,
+  WrenchIcon,
+  ZapIcon,
+  AlertTriangleIcon,
+  CheckCircleIcon
+} from './Icons';
 
 interface Message {
   id: string;
@@ -72,95 +80,98 @@ export const AiCopilotAndInsights: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto pb-12">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12 font-sans">
       {/* Title Header */}
-      <div className="flex items-center space-x-3 bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-        <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl font-bold">
-          🧠
+      <div className="flex items-center space-x-3 bg-slate-900 p-6 rounded-3xl shadow-xl border border-slate-800">
+        <div className="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-400 flex items-center justify-center border border-purple-500/30">
+          <SparklesIcon className="w-6 h-6" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Copiloto IA & Auditoria de Dados</h1>
-          <p className="text-xs text-slate-500 font-medium">Analista de dados dedicado, alertas proativos e chat inteligente com a frota</p>
+          <h1 className="text-2xl font-black text-white tracking-tight font-display">Copiloto IA & Auditoria Preditiva</h1>
+          <p className="text-xs text-slate-400 font-medium">Analista de dados dedicado, alertas proativos e chat inteligente com a frota</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: AI Fleet Copilot Chat */}
-        <div className="lg:col-span-6 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col h-[560px]">
-          <div className="p-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800">
+        <div className="lg:col-span-6 bg-slate-900 rounded-3xl shadow-xl border border-slate-800 overflow-hidden flex flex-col h-[560px]">
+          <div className="p-4 bg-slate-950 text-white flex items-center justify-between border-b border-slate-800">
             <div className="flex items-center space-x-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="text-xs font-black tracking-wide">CHAT COPILOTO COM A FROTA</span>
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-cyan animate-pulse"></span>
+              <span className="text-xs font-black tracking-wide text-brand-cyan font-display">CHAT COPILOTO COM A FROTA</span>
             </div>
-            <span className="text-[10px] bg-slate-800 text-slate-300 font-bold px-2 py-0.5 rounded-full border border-slate-700">
+            <span className="text-[10px] bg-slate-900 text-slate-400 font-black px-2.5 py-0.5 rounded-full border border-slate-800">
               GEMINI 2.0 FLASH
             </span>
           </div>
 
           {/* Quick Prompt Badges */}
-          <div className="p-3 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-1.5">
+          <div className="p-3 bg-slate-950/60 border-b border-slate-800 flex flex-wrap gap-1.5">
             <button
               onClick={() => handleSendMessage('Quais carros estão alugados hoje?')}
-              className="text-[10px] font-bold bg-white hover:bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+              className="flex items-center space-x-1 text-[10px] font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1 rounded-lg border border-slate-800 transition-colors cursor-pointer"
             >
-              🚗 Carros alugados hoje
+              <CarIcon className="w-3 h-3 text-brand-cyan" />
+              <span>Carros alugados hoje</span>
             </button>
             <button
               onClick={() => handleSendMessage('Qual o KM do HB20 e próximas trocas de óleo?')}
-              className="text-[10px] font-bold bg-white hover:bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+              className="flex items-center space-x-1 text-[10px] font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1 rounded-lg border border-slate-800 transition-colors cursor-pointer"
             >
-              🛢️ KM do HB20 & Óleo
+              <WrenchIcon className="w-3 h-3 text-amber-400" />
+              <span>KM do HB20 & Óleo</span>
             </button>
             <button
               onClick={() => handleSendMessage('Quanto faturamos nesta semana com os motoristas?')}
-              className="text-[10px] font-bold bg-white hover:bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-300 transition-colors shadow-2xs"
+              className="flex items-center space-x-1 text-[10px] font-bold bg-slate-900 hover:bg-slate-800 text-slate-300 px-3 py-1 rounded-lg border border-slate-800 transition-colors cursor-pointer"
             >
-              💰 Faturamento semanal
+              <ZapIcon className="w-3 h-3 text-emerald-400" />
+              <span>Faturamento semanal</span>
             </button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50/50">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-950/40">
             {messages.map((msg) => (
               <div
                 key={msg.id}
                 className={`flex flex-col ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[85%] p-3.5 rounded-2xl text-xs whitespace-pre-line leading-relaxed shadow-2xs ${
+                  className={`max-w-[85%] p-4 rounded-2xl text-xs whitespace-pre-line leading-relaxed shadow-md ${
                     msg.sender === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-none'
-                      : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-none'
+                      ? 'bg-gradient-to-r from-brand-500 to-blue-600 text-white rounded-br-none font-medium'
+                      : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none'
                   }`}
                 >
                   {msg.text}
                 </div>
-                <span className="text-[9px] text-slate-400 mt-1 px-1">{msg.timestamp}</span>
+                <span className="text-[9px] text-slate-500 mt-1 px-1">{msg.timestamp}</span>
               </div>
             ))}
             {isTyping && (
-              <div className="flex items-center space-x-1.5 p-3 bg-white rounded-2xl border border-slate-200 max-w-[100px]">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce [animation-delay:0.2s]"></span>
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-bounce [animation-delay:0.4s]"></span>
+              <div className="flex items-center space-x-1.5 p-3.5 bg-slate-900 rounded-2xl border border-slate-800 max-w-[100px]">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-bounce"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-bounce [animation-delay:0.2s]"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan animate-bounce [animation-delay:0.4s]"></span>
               </div>
             )}
           </div>
 
           {/* Input Bar */}
-          <div className="p-3 bg-white border-t border-slate-200 flex items-center space-x-2">
+          <div className="p-3 bg-slate-950 border-t border-slate-800 flex items-center space-x-2">
             <input
               type="text"
               placeholder="Pergunte sobre carros, KM, faturamento ou motoristas..."
               value={inputQuery}
               onChange={(e) => setInputQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-              className="flex-1 bg-slate-50 border border-slate-300 text-xs rounded-xl px-3.5 py-2.5 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none placeholder-slate-400"
+              className="flex-1 bg-slate-900 border border-slate-700 text-xs rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-brand-500 focus:outline-none placeholder-slate-500"
             />
             <button
               onClick={() => handleSendMessage()}
-              className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition-all active:scale-95 shadow-sm"
+              className="bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-5 py-2.5 rounded-xl text-xs font-black transition-all active:scale-95 shadow-md shadow-brand-500/20 cursor-pointer"
             >
               Enviar
             </button>
@@ -169,14 +180,14 @@ export const AiCopilotAndInsights: React.FC = () => {
 
         {/* Right Column: AI Data Analyst Insights Cards */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="flex items-center justify-between bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80">
+          <div className="flex items-center justify-between bg-slate-900 p-5 rounded-3xl shadow-xl border border-slate-800">
             <div className="flex items-center space-x-2">
-              <span className="text-lg">💡</span>
-              <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wide">
+              <SparklesIcon className="w-5 h-5 text-brand-cyan" />
+              <h2 className="text-sm font-black text-white uppercase tracking-wider font-display">
                 Auditoria Preditiva de Dados (Insights)
               </h2>
             </div>
-            <span className="text-[10px] font-extrabold bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-full">
+            <span className="text-[10px] font-black bg-purple-500/20 text-purple-300 border border-purple-500/30 px-3 py-1 rounded-full">
               3 AUDITORIAS ATIVAS
             </span>
           </div>
@@ -184,33 +195,37 @@ export const AiCopilotAndInsights: React.FC = () => {
           {mockAiInsights.map((insight) => (
             <div
               key={insight.id}
-              className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition-shadow space-y-3"
+              className="bg-slate-900 p-6 rounded-3xl shadow-xl border border-slate-800 hover:border-slate-700 transition-all space-y-3"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-center space-x-2">
-                  <span className="text-base">
-                    {insight.severity === 'high' ? '🚨' : insight.severity === 'medium' ? '⚠️' : '📈'}
-                  </span>
-                  <h3 className="text-xs font-black text-slate-900">{insight.title}</h3>
+                  {insight.severity === 'high' ? (
+                    <AlertTriangleIcon className="w-5 h-5 text-rose-400 shrink-0" />
+                  ) : insight.severity === 'medium' ? (
+                    <AlertTriangleIcon className="w-5 h-5 text-amber-400 shrink-0" />
+                  ) : (
+                    <CheckCircleIcon className="w-5 h-5 text-emerald-400 shrink-0" />
+                  )}
+                  <h3 className="text-xs font-black text-white">{insight.title}</h3>
                 </div>
                 <span
-                  className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md ${
+                  className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
                     insight.severity === 'high'
-                      ? 'bg-rose-100 text-rose-700'
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/30'
                       : insight.severity === 'medium'
-                      ? 'bg-amber-100 text-amber-700'
-                      : 'bg-emerald-100 text-emerald-700'
+                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
+                      : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
                   }`}
                 >
                   {insight.impactMetric}
                 </span>
               </div>
 
-              <p className="text-xs text-slate-600 leading-relaxed">{insight.description}</p>
+              <p className="text-xs text-slate-400 leading-relaxed">{insight.description}</p>
 
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200/60 flex items-start space-x-2">
-                <span className="text-xs text-emerald-600 font-bold">➔</span>
-                <p className="text-[11px] font-bold text-slate-700 leading-snug">
+              <div className="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800 flex items-start space-x-2">
+                <span className="text-xs text-brand-cyan font-bold">➔</span>
+                <p className="text-[11px] font-bold text-slate-300 leading-snug">
                   {insight.recommendation}
                 </p>
               </div>

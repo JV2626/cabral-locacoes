@@ -2,6 +2,15 @@ import React, { useState } from 'react';
 import { mockVehicles } from '../lib/mock-data';
 import { formatCurrency } from '../lib/utils/calculations';
 import { BrandLogo } from './BrandLogo';
+import {
+  WhatsAppIcon,
+  ZapIcon,
+  KeyIcon,
+  ShieldCheckIcon,
+  WrenchIcon,
+  CarIcon,
+  ChartIcon
+} from './Icons';
 
 interface PublicLandingPageProps {
   onOpenContactHub: () => void;
@@ -46,7 +55,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             </div>
 
             <div className="inline-flex items-center space-x-2 bg-brand-500/10 border border-brand-500/30 text-brand-cyan px-4 py-1.5 rounded-full text-xs font-black tracking-widest uppercase">
-              <span>⚡</span>
+              <ZapIcon className="w-3.5 h-3.5 text-brand-cyan" />
               <span>Locação Especializada para Motoristas de App</span>
             </div>
 
@@ -61,15 +70,18 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3.5 pt-2">
               <button
                 onClick={onOpenDriverAuth || onOpenContactHub}
-                className="w-full sm:w-auto bg-gradient-to-r from-brand-500 via-blue-600 to-brand-500 hover:from-brand-600 hover:to-blue-700 text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-xl shadow-[#25D366]/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
               >
-                🚀 Quero Alugar / Cadastrar Agora
+                <WhatsAppIcon className="w-5 h-5 fill-white" />
+                <span>Alugar Carro no WhatsApp</span>
               </button>
+
               <button
                 onClick={onGoToDashboard}
-                className="w-full sm:w-auto bg-slate-900/90 hover:bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold text-sm border border-slate-700 hover:border-brand-500/50 transition-all cursor-pointer shadow-md"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-slate-900/90 hover:bg-slate-800 text-white px-8 py-4 rounded-2xl font-bold text-sm border border-slate-700 hover:border-brand-500/50 transition-all cursor-pointer shadow-md"
               >
-                👑 Acessar Painel do Dono
+                <ChartIcon className="w-4 h-4 text-brand-cyan" />
+                <span>Acessar Painel do Dono</span>
               </button>
             </div>
           </div>
@@ -116,8 +128,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
                           : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
                       }`}
                     >
-                      🚗 Hatch (Onix/HB20)
-                      <span className="block text-[10px] font-normal mt-0.5">R$ 490/semana</span>
+                      <span className="font-extrabold block">🚗 Hatch (Onix/HB20)</span>
+                      <span className="block text-[10px] text-slate-400 font-normal mt-0.5">R$ 490/semana</span>
                     </button>
                     <button
                       onClick={() => setSimulatorCarType('sedan')}
@@ -127,8 +139,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
                           : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
                       }`}
                     >
-                      🚘 Sedã (Cronos/Onix+)
-                      <span className="block text-[10px] font-normal mt-0.5">R$ 560/semana</span>
+                      <span className="font-extrabold block">🚘 Sedã (Cronos/Onix+)</span>
+                      <span className="block text-[10px] text-slate-400 font-normal mt-0.5">R$ 560/semana</span>
                     </button>
                   </div>
                 </div>
@@ -146,10 +158,11 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
                   *Já descontado o valor da semanalidade e o combustível estimado. Sem custos com seguro, IPVA ou troca de óleo!
                 </p>
                 <button
-                  onClick={onOpenDriverAuth || onOpenContactHub}
-                  className="w-full mt-2 bg-gradient-to-r from-brand-cyan to-brand-400 hover:from-brand-300 hover:to-brand-cyan text-slate-950 font-black py-3 rounded-xl text-xs transition-all shadow-md active:scale-95 cursor-pointer uppercase tracking-wider"
+                  onClick={onOpenContactHub}
+                  className="w-full mt-2 flex items-center justify-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white font-black py-3 rounded-xl text-xs transition-all shadow-md shadow-[#25D366]/20 active:scale-95 cursor-pointer uppercase tracking-wider"
                 >
-                  Garantir Meu Carro Agora
+                  <WhatsAppIcon className="w-4 h-4 fill-white" />
+                  <span>Garantir Meu Carro no WhatsApp</span>
                 </button>
               </div>
             </div>
@@ -220,9 +233,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
 
                 <button
                   onClick={onOpenContactHub}
-                  className="bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer shadow-md shadow-brand-500/20"
+                  className="flex items-center space-x-1.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-4 py-2 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer shadow-md shadow-[#25D366]/20"
                 >
-                  Alugar Carro
+                  <WhatsAppIcon className="w-3.5 h-3.5 fill-white" />
+                  <span>Alugar Agora</span>
                 </button>
               </div>
             </div>
@@ -242,25 +256,33 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
             <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
-              <span className="text-2xl">⚡</span>
+              <div className="w-10 h-10 rounded-xl bg-brand-500/20 text-brand-cyan flex items-center justify-center border border-brand-500/30">
+                <ZapIcon className="w-5 h-5" />
+              </div>
               <h3 className="text-sm font-extrabold text-white">Retirada em 2 Minutos</h3>
               <p className="text-xs text-slate-400">Contrato assinado pelo celular antes de sair de casa. Sem filas no balcão.</p>
             </div>
 
             <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
-              <span className="text-2xl">💸</span>
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                <KeyIcon className="w-5 h-5" />
+              </div>
               <h3 className="text-sm font-extrabold text-white">Caução Facilitada</h3>
               <p className="text-xs text-slate-400">Devolução instantânea no PIX no ato da entrega do veículo, sem prender seu cartão.</p>
             </div>
 
             <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
-              <span className="text-2xl">🛢️</span>
+              <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center border border-amber-500/30">
+                <WrenchIcon className="w-5 h-5" />
+              </div>
               <h3 className="text-sm font-extrabold text-white">Manutenção 100% Inclusa</h3>
               <p className="text-xs text-slate-400">Troca de óleo, pastilhas de freio e pneus cobertos pela locadora sem custos extras.</p>
             </div>
 
             <div className="bg-slate-950/80 border border-slate-800/80 p-5 rounded-2xl space-y-2 hover:border-brand-500/40 transition-colors">
-              <span className="text-2xl">🤝</span>
+              <div className="w-10 h-10 rounded-xl bg-[#25D366]/20 text-[#25D366] flex items-center justify-center border border-[#25D366]/30">
+                <WhatsAppIcon className="w-5 h-5 fill-[#25D366]" />
+              </div>
               <h3 className="text-sm font-extrabold text-white">Atendimento Humanizado</h3>
               <p className="text-xs text-slate-400">Fale direto com a nossa equipe no WhatsApp, com respostas rápidas e sem robôs de 0800.</p>
             </div>
