@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { mockMaintenanceRules, mockQuotedParts } from '../lib/mock-data';
 import { formatKm, formatCurrency } from '../lib/utils/calculations';
+import { generatePurchaseOrderPdf } from '../lib/utils/pdfGenerator';
 
 export const MaintenanceDashboard: React.FC = () => {
   const [vehicleSearch, setVehicleSearch] = useState('');
@@ -19,6 +20,26 @@ export const MaintenanceDashboard: React.FC = () => {
 
   const totalQuote = parts.reduce((acc, curr) => acc + (curr.quantity * curr.unitPrice), 0);
   const estimatedSavings = totalQuote * 0.18; // 18% lote
+
+  const handleGeneratePdf = () => {
+    const orderNumber = `OC-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const formattedDate = new Date().toLocaleDateString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+
+    generatePurchaseOrderPdf({
+      orderNumber,
+      date: formattedDate,
+      items: parts,
+      totalAmount: totalQuote,
+      estimatedSavings: estimatedSavings
+    });
+
+    setOrderGenerated(true);
+    setTimeout(() => setOrderGenerated(false), 5000);
+  };
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
@@ -283,14 +304,11 @@ export const MaintenanceDashboard: React.FC = () => {
             </span>
           )}
           <button
-            onClick={() => {
-              setOrderGenerated(true);
-              setTimeout(() => setOrderGenerated(false), 4000);
-            }}
-            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-lg shadow-emerald-500/20 active:scale-95"
+            onClick={handleGeneratePdf}
+            className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 px-5 py-2.5 rounded-xl font-extrabold text-xs transition-all shadow-lg shadow-emerald-500/20 active:scale-95 cursor-pointer"
           >
             <span>📄</span>
-            <span>Gerar Ordem de Compra em PDF</span>
+            <span>Baixar Ordem de Compra em PDF</span>
           </button>
         </div>
       </div>

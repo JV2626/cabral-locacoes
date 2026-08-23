@@ -14,9 +14,13 @@ export function calculateRemainingKm(
   lastServiceKm: number,
   intervalKm: number
 ): { remainingKm: number; percentage: number; status: 'green' | 'yellow' | 'red' } {
-  const kmSinceLastService = currentKm - lastServiceKm;
+  if (intervalKm <= 0) {
+    return { remainingKm: 0, percentage: 100, status: 'red' };
+  }
+
+  const kmSinceLastService = Math.max(0, currentKm - lastServiceKm);
   const remainingKm = Math.max(0, intervalKm - kmSinceLastService);
-  const percentage = Math.min(100, Math.round((kmSinceLastService / intervalKm) * 100));
+  const percentage = Math.min(100, Math.max(0, Math.round((kmSinceLastService / intervalKm) * 100)));
 
   let status: 'green' | 'yellow' | 'red' = 'green';
   if (percentage >= 85 || remainingKm <= 500) {

@@ -1,4 +1,4 @@
-import { Vehicle, MaintenanceRule, Contract, KpiMetrics, AiInsight, QuotedPartItem } from '../types/fleet';
+import { Vehicle, MaintenanceRule, Contract, KpiMetrics, AiInsight, QuotedPartItem, TrafficFine, DriverScore } from '../types/fleet';
 
 export const mockVehicles: Vehicle[] = [
   {
@@ -352,3 +352,75 @@ export const mockQuotedParts: QuotedPartItem[] = [
     unitPrice: 32.00
   }
 ];
+
+export const mockTrafficFines: TrafficFine[] = [
+  {
+    id: 'fine-1',
+    vehiclePlate: 'XYZ-9876',
+    vehicleModel: 'Chevrolet Onix Plus',
+    driverName: 'Felipe Souza Neves',
+    driverPhone: '(11) 96543-2109',
+    driverCnh: '06192837465',
+    infractionCode: '745-5-0',
+    description: 'Transitar em velocidade superior à máxima permitida em até 20%',
+    location: 'Av. das Nações Unidas, km 12.4 — São Paulo/SP',
+    date: '18/08/2026 14:32',
+    amount: 130.16,
+    points: 4,
+    status: 'pending_transfer',
+    dueDate: '15/09/2026'
+  },
+  {
+    id: 'fine-2',
+    vehiclePlate: 'ABC-1234',
+    vehicleModel: 'Hyundai HB20 1.0',
+    driverName: 'Carlos Eduardo Santos',
+    driverPhone: '(11) 97654-3210',
+    driverCnh: '04829104928',
+    infractionCode: '605-0-3',
+    description: 'Avançar o sinal vermelho do semáforo',
+    location: 'Av. Paulista x Rua da Consolação — São Paulo/SP',
+    date: '12/08/2026 23:14',
+    amount: 293.47,
+    points: 7,
+    status: 'transferred',
+    dueDate: '08/09/2026'
+  }
+];
+
+export const mockDriverScores: DriverScore[] = [
+  {
+    id: 'sc-1',
+    driverName: 'Marcos Roberto da Silva',
+    driverPhone: '(11) 98765-4321',
+    score: 980,
+    tier: 'Diamante',
+    ontimePaymentRate: 100,
+    odometerComplianceRate: 100,
+    zeroFinesMonths: 6,
+    depositDiscountPercent: 50
+  },
+  {
+    id: 'sc-2',
+    driverName: 'Carlos Eduardo Santos',
+    driverPhone: '(11) 97654-3210',
+    score: 840,
+    tier: 'Ouro',
+    ontimePaymentRate: 92,
+    odometerComplianceRate: 95,
+    zeroFinesMonths: 3,
+    depositDiscountPercent: 25
+  },
+  {
+    id: 'sc-3',
+    driverName: 'Felipe Souza Neves',
+    driverPhone: '(11) 96543-2109',
+    score: 620,
+    tier: 'Prata',
+    ontimePaymentRate: 70,
+    odometerComplianceRate: 80,
+    zeroFinesMonths: 0,
+    depositDiscountPercent: 0
+  }
+];
+

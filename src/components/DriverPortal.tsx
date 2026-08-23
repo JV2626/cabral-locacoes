@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { mockVehicles, mockContracts, mockMaintenanceRules } from '../lib/mock-data';
-import { formatCurrency, formatKm } from '../lib/utils/calculations';
+import { formatCurrency, formatKm, calculateRemainingKm } from '../lib/utils/calculations';
+import { analyzeDashboardImage, OcrResult } from '../lib/utils/ocrService';
+import { updateVehicleOdometer } from '../lib/supabase';
 
 interface DriverPortalProps {
   onOpenContactHub: () => void;
@@ -12,13 +14,55 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
   const [smsCode, setSmsCode] = useState('');
   const [step, setStep] = useState<'identify' | 'verify'>('identify');
   const [errorMsg, setErrorMsg] = useState('');
-  const [photoSent, setPhotoSent] = useState(false);
   const [pixCopied, setPixCopied] = useState(false);
+
+  // OCR & Photo States
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Authenticated driver contract (isolated query)
   const currentContract = mockContracts[1]; // Carlos Eduardo (HB20)
+  const [driverKm, setDriverKm] = useState(48210);
   const currentVehicle = mockVehicles.find(v => v.plate === currentContract.vehiclePlate) || mockVehicles[1];
-  const currentMaintenance = mockMaintenanceRules.find(m => m.vehiclePlate === currentContract.vehiclePlate) || mockMaintenanceRules[4];
+  
+  // Calculate dynamic maintenance based on updated KM
+  const initialServiceKm = 40000;
+  const serviceInterval = 10000;
+  const maintCalc = calculateRemainingKm(driverKm, initialServiceKm, serviceInterval);
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setSelectedPhoto(reader.result as string);
+        setOcrResult(null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRunOcr = async () => {
+    if (!selectedPhoto) return;
+    setIsScanning(true);
+    setErrorMsg('');
+
+    try {
+      const result = await analyzeDashboardImage(selectedPhoto, driverKm);
+      setOcrResult(result);
+      setDriverKm(result.extractedKm);
+      await updateVehicleOdometer(currentVehicle.plate, result.extractedKm);
+      setSuccessToast(`Odômetro lido com sucesso: ${formatKm(result.extractedKm)} (${result.confidence}% de precisão da IA)`);
+      setTimeout(() => setSuccessToast(null), 5000);
+    } catch {
+      setErrorMsg('Falha ao analisar a foto do painel. Tente novamente com mais iluminação.');
+    } finally {
+      setIsScanning(false);
+    }
+  };
 
   const handleRequestCode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,15 +233,15 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
           </button>
         </div>
 
-        {/* 2. Photo Upload for KM & Maintenance Status */}
+        {/* 2. Photo Upload for KM & AI OCR Scanning */}
         <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-200/80 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center space-x-2">
               <span className="text-lg">📸</span>
-              <h3 className="text-sm font-extrabold text-slate-900">Foto Semanal do Painel</h3>
+              <h3 className="text-sm font-extrabold text-slate-900">Foto Semanal do Painel (OCR IA)</h3>
             </div>
             <span className="text-[10px] font-extrabold bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full">
-              OBRIGATÓRIO
+              GEMINI 2.0 VISION
             </span>
           </div>
 
@@ -205,21 +249,74 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
             Envie a foto do painel do carro todo domingo para mantermos suas revisões gratuitas em dia:
           </p>
 
-          <div className="border-2 border-dashed border-slate-200 hover:border-blue-400 p-5 rounded-2xl text-center space-y-2 cursor-pointer transition-colors bg-slate-50/50">
-            <span className="text-2xl block">📷</span>
-            <span className="text-xs font-bold text-slate-700 block">Tirar foto do Odômetro ou Escolher Arquivo</span>
-            <span className="text-[10px] text-slate-400 block">A IA lê o KM automaticamente</span>
-          </div>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            onChange={handlePhotoSelect}
+            className="hidden"
+          />
 
-          <button
-            onClick={() => {
-              setPhotoSent(true);
-              setTimeout(() => setPhotoSent(false), 4000);
-            }}
-            className="w-full flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-xl text-xs transition-all active:scale-95"
-          >
-            <span>{photoSent ? '✅ Foto Enviada e KM Atualizado!' : 'Enviar Foto do Painel'}</span>
-          </button>
+          {!selectedPhoto ? (
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="border-2 border-dashed border-slate-200 hover:border-blue-500 p-5 rounded-2xl text-center space-y-2 cursor-pointer transition-colors bg-slate-50/50"
+            >
+              <span className="text-2xl block">📷</span>
+              <span className="text-xs font-bold text-slate-700 block">Tirar foto do Odômetro ou Escolher Arquivo</span>
+              <span className="text-[10px] text-slate-400 block">A IA lê o KM automaticamente</span>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900 max-h-48 flex items-center justify-center">
+                <img src={selectedPhoto} alt="Painel do Veículo" className="w-full h-full object-cover" />
+                {isScanning && (
+                  <div className="absolute inset-0 bg-slate-950/75 backdrop-blur-xs flex flex-col items-center justify-center space-y-2 text-white">
+                    <span className="w-6 h-6 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></span>
+                    <span className="text-xs font-black tracking-wide text-emerald-400 animate-pulse">
+                      IA Gemini Lendo Odômetro...
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {ocrResult && (
+                <div className="bg-emerald-50 border border-emerald-200 p-3.5 rounded-2xl text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-emerald-900">✅ KM Detectado: {formatKm(ocrResult.extractedKm)}</span>
+                    <span className="bg-emerald-200 text-emerald-800 text-[10px] font-black px-2 py-0.5 rounded-full">
+                      {ocrResult.confidence}% Precisão
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-emerald-700">
+                    Odômetro atualizado no sistema em {ocrResult.readingTimestamp}.
+                  </p>
+                </div>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex-1 text-xs font-bold text-slate-600 border border-slate-200 hover:bg-slate-50 py-2 rounded-xl"
+                >
+                  Trocar Foto
+                </button>
+                <button
+                  onClick={handleRunOcr}
+                  disabled={isScanning}
+                  className="flex-1 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-2 rounded-xl text-xs shadow-md transition-all active:scale-95"
+                >
+                  {isScanning ? 'Processando...' : '🔍 Analisar com IA'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {successToast && (
+            <div className="p-2.5 bg-emerald-100 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold text-center animate-in fade-in">
+              {successToast}
+            </div>
+          )}
         </div>
       </div>
 
@@ -230,19 +327,27 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({ onOpenContactHub }) 
             <h3 className="text-sm font-extrabold text-slate-900">🔧 Próxima Revisão do seu Carro</h3>
             <p className="text-xs text-slate-500">Manutenção 100% paga pela Cabral Locações</p>
           </div>
-          <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-            Faltam {formatKm(currentMaintenance.remainingKm)}
+          <span
+            className={`text-xs font-black px-3 py-1 rounded-full border ${
+              maintCalc.status === 'red'
+                ? 'bg-rose-50 text-rose-700 border-rose-200'
+                : maintCalc.status === 'yellow'
+                ? 'bg-amber-50 text-amber-700 border-amber-200'
+                : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+            }`}
+          >
+            Faltam {formatKm(maintCalc.remainingKm)}
           </span>
         </div>
 
         <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 flex items-center justify-between text-xs">
           <div>
-            <span className="font-bold text-slate-800 block">{currentMaintenance.serviceName}</span>
-            <span className="text-slate-400 text-[11px]">KM Atual: {formatKm(currentVehicle.currentKm)}</span>
+            <span className="font-bold text-slate-800 block">Troca de Óleo & Filtro Sintético</span>
+            <span className="text-slate-400 text-[11px]">KM Atual: {formatKm(driverKm)} (Próxima revisão aos {formatKm(initialServiceKm + serviceInterval)})</span>
           </div>
           <button
             onClick={onOpenContactHub}
-            className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all"
+            className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer"
           >
             Agendar na Oficina
           </button>

@@ -98,3 +98,32 @@ export interface QuotedPartItem {
   unit: string;
   unitPrice: number;
 }
+
+export interface TrafficFine {
+  id: string;
+  vehiclePlate: string;
+  vehicleModel: string;
+  driverName: string;
+  driverPhone: string;
+  driverCnh: string;
+  infractionCode: string;
+  description: string;
+  location: string;
+  date: string;
+  amount: number;
+  points: number;
+  status: 'pending_transfer' | 'transferred' | 'paid_by_driver';
+  dueDate: string;
+}
+
+export interface DriverScore {
+  id: string;
+  driverName: string;
+  driverPhone: string;
+  score: number; // 0 to 1000
+  tier: 'Diamante' | 'Ouro' | 'Prata' | 'Bronze';
+  ontimePaymentRate: number; // %
+  odometerComplianceRate: number; // %
+  zeroFinesMonths: number;
+  depositDiscountPercent: number;
+}

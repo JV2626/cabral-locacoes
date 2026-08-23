@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { NotificationsDropdown } from './NotificationsDropdown';
 
 interface NavbarProps {
   activeTab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista';
@@ -19,6 +20,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onSelectAdminRole,
   isAdminAuthenticated
 }) => {
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 bg-slate-900 border-b border-slate-800 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -38,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <nav className="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60">
             <button
               onClick={() => setActiveTab('public')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'public'
                   ? 'bg-emerald-500 text-slate-950 shadow-sm font-black'
                   : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
@@ -51,7 +54,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               <>
                 <button
                   onClick={() => setActiveTab('dashboard')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'dashboard'
                       ? 'bg-blue-600 text-white shadow-sm'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
@@ -61,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab('manutencao')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'manutencao'
                       ? 'bg-amber-500 text-slate-950 shadow-sm font-bold'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
@@ -71,7 +74,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab('insights')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'insights'
                       ? 'bg-purple-600 text-white shadow-sm font-bold'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
@@ -81,7 +84,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab('frota')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     activeTab === 'frota'
                       ? 'bg-slate-700 text-white shadow-sm font-bold'
                       : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
@@ -93,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => setActiveTab('motorista')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                   activeTab === 'motorista'
                     ? 'bg-emerald-500 text-slate-950 shadow-sm'
                     : 'text-slate-300 hover:text-white hover:bg-slate-700/60'
@@ -104,26 +107,51 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </nav>
 
-          {/* Role Switcher & Contact Hub CTA */}
-          <div className="flex items-center space-x-2.5">
+          {/* Role Switcher, Notification Bell & Contact Hub CTA */}
+          <div className="flex items-center space-x-2 sm:space-x-2.5 relative">
+            {/* Notification Bell (Only for Admin when authenticated) */}
+            {userRole === 'admin' && isAdminAuthenticated && (
+              <div className="relative">
+                <button
+                  onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                  className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-sm transition-all relative cursor-pointer"
+                  title="Central de Notificações"
+                >
+                  <span>🔔</span>
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
+                    3
+                  </span>
+                </button>
+
+                <NotificationsDropdown
+                  isOpen={isNotificationsOpen}
+                  onClose={() => setIsNotificationsOpen(false)}
+                  onNavigateTab={(tab) => {
+                    setActiveTab(tab);
+                    setIsNotificationsOpen(false);
+                  }}
+                />
+              </div>
+            )}
+
             {/* User Role Switcher Dropdown */}
             <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-1 text-xs">
               <button
                 onClick={onSelectAdminRole}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   userRole === 'admin' && isAdminAuthenticated
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                {isAdminAuthenticated ? '👑 Admin (Logado)' : '🔒 Entrar como Admin'}
+                {isAdminAuthenticated ? '👑 Admin' : '🔒 Entrar Admin'}
               </button>
               <button
                 onClick={() => {
                   setUserRole('driver');
                   setActiveTab('motorista');
                 }}
-                className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer ${
                   userRole === 'driver'
                     ? 'bg-emerald-500 text-slate-950 shadow-xs'
                     : 'text-slate-400 hover:text-white'
