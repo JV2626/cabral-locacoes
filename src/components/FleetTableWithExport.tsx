@@ -210,10 +210,11 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
                     {onEditVehicle && (
                       <button
                         onClick={() => onEditVehicle(vehicle)}
-                        className="bg-slate-950 hover:bg-brand-500/20 border border-slate-700 hover:border-brand-500/40 text-slate-200 hover:text-brand-300 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
-                        title="Editar Veículo e Fotos"
+                        className="btn-secondary px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer inline-flex items-center space-x-1 hover:border-blue-500"
+                        title="Editar Veículo e Múltiplas Fotos"
                       >
-                        ✏️ Editar
+                        <span>✏️</span>
+                        <span>Editar</span>
                       </button>
                     )}
                   </td>

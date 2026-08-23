@@ -19,15 +19,25 @@ interface PublicLandingPageProps {
   onOpenDriverAuth?: () => void;
   theme?: 'dark' | 'light';
   vehicles?: Vehicle[];
+  isAdmin?: boolean;
+  onEditVehicle?: (vehicle: Vehicle) => void;
 }
 
 interface VehicleCardProps {
   car: Vehicle;
   isLight: boolean;
   onOpenContactHub: () => void;
+  isAdmin?: boolean;
+  onEditVehicle?: (vehicle: Vehicle) => void;
 }
 
-const VehicleCardWithGallery: React.FC<VehicleCardProps> = ({ car, isLight, onOpenContactHub }) => {
+const VehicleCardWithGallery: React.FC<VehicleCardProps> = ({
+  car,
+  isLight,
+  onOpenContactHub,
+  isAdmin = false,
+  onEditVehicle
+}) => {
   const photoList = useMemo(() => {
     if (car.photos && car.photos.length > 0) return car.photos;
     if (car.photoUrl) return [car.photoUrl];
@@ -73,6 +83,18 @@ const VehicleCardWithGallery: React.FC<VehicleCardProps> = ({ car, isLight, onOp
           }`}>
             {car.category}
           </span>
+
+          {/* Admin Edit Floating Badge */}
+          {isAdmin && onEditVehicle && (
+            <button
+              onClick={() => onEditVehicle(car)}
+              className="absolute top-3 left-3 bg-amber-500 hover:bg-amber-400 text-slate-950 text-[10px] font-black px-2.5 py-1 rounded-full border border-amber-400 shadow-md transition-all cursor-pointer flex items-center space-x-1"
+              title="Editar Veículo"
+            >
+              <span>✏️</span>
+              <span>Editar</span>
+            </button>
+          )}
 
           {/* Gallery Controls (if more than 1 photo) */}
           {photoList.length > 1 && (
@@ -137,7 +159,7 @@ const VehicleCardWithGallery: React.FC<VehicleCardProps> = ({ car, isLight, onOp
         </div>
       </div>
 
-      <div className={`p-5 border-t flex items-center justify-between ${
+      <div className={`p-5 border-t flex items-center justify-between gap-2 ${
         isLight ? 'border-slate-100' : 'border-slate-800/80'
       }`}>
         <div>
@@ -148,12 +170,23 @@ const VehicleCardWithGallery: React.FC<VehicleCardProps> = ({ car, isLight, onOp
             {formatCurrency(car.weeklyRate)}
           </span>
         </div>
-        <button
-          onClick={onOpenContactHub}
-          className="bg-brand-500 hover:bg-brand-600 text-white font-black px-4 py-2 rounded-xl text-xs shadow-md transition-all active:scale-95 cursor-pointer font-display uppercase tracking-wider"
-        >
-          Alugar Agora
-        </button>
+
+        <div className="flex items-center space-x-2">
+          {isAdmin && onEditVehicle && (
+            <button
+              onClick={() => onEditVehicle(car)}
+              className="btn-secondary px-3 py-2 rounded-xl text-xs font-bold cursor-pointer"
+            >
+              ✏️ Editar
+            </button>
+          )}
+          <button
+            onClick={onOpenContactHub}
+            className="btn-primary px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider font-display cursor-pointer"
+          >
+            Alugar Agora
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -164,7 +197,9 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   onGoToDashboard,
   onOpenDriverAuth,
   theme = 'dark',
-  vehicles
+  vehicles,
+  isAdmin = false,
+  onEditVehicle
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'Hatch' | 'Sedan' | 'SUV'>('all');
   const [simulatorHours, setSimulatorHours] = useState(8);
@@ -493,6 +528,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
               car={car}
               isLight={isLight}
               onOpenContactHub={onOpenContactHub}
+              isAdmin={isAdmin}
+              onEditVehicle={onEditVehicle}
             />
           ))}
         </div>

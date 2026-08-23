@@ -6,6 +6,7 @@ import { MaintenanceDashboard } from './components/MaintenanceDashboard';
 import { AiCopilotAndInsights } from './components/AiCopilotAndInsights';
 import { FleetTableWithExport } from './components/FleetTableWithExport';
 import { RentalManagement } from './components/RentalManagement';
+import { CompanySettingsTab } from './components/CompanySettingsTab';
 import { AddVehicleModal } from './components/AddVehicleModal';
 import { EditVehicleModal } from './components/EditVehicleModal';
 import { SettingsModal } from './components/SettingsModal';
@@ -32,7 +33,7 @@ import { calculateRemainingKm } from './lib/utils/calculations';
 import { sendPushNotification } from './lib/notifications';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista'>('public');
+  const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista' | 'empresa'>('public');
   const [userRole, setUserRole] = useState<'admin' | 'driver'>('driver');
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
@@ -54,7 +55,7 @@ export const App: React.FC = () => {
   const [maintenanceRules, setMaintenanceRules] = useState<MaintenanceRule[]>(mockMaintenanceRules);
   const [settings, setSettings] = useState<AppSettings>(defaultAppSettings);
 
-  // Load saved profile, vehicles & settings from localStorage
+  // Load saved vehicles & settings from localStorage
   useEffect(() => {
     try {
       const savedVehicles = localStorage.getItem('cabral_vehicles');
@@ -62,20 +63,22 @@ export const App: React.FC = () => {
         setVehicles(JSON.parse(savedVehicles));
       }
 
-      const saved = localStorage.getItem('cabral_user_profile');
-      if (saved) {
-        const parsed = JSON.parse(saved) as UserProfile;
-        setUserProfile(parsed);
-        if (parsed.role === 'admin') {
-          setIsAdminAuthenticated(true);
-        } else {
-          setIsDriverAuthenticated(true);
-        }
-      }
-
       const savedSettings = localStorage.getItem('cabral_settings');
       if (savedSettings) {
         setSettings(JSON.parse(savedSettings));
+      }
+
+      const savedProfile = localStorage.getItem('cabral_user_profile');
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile) as UserProfile;
+        setUserProfile(parsed);
+        if (parsed.role === 'admin') {
+          setIsAdminAuthenticated(true);
+          setUserRole('admin');
+        } else {
+          setIsDriverAuthenticated(true);
+          setUserRole('driver');
+        }
       }
     } catch {
       // ignore
@@ -138,6 +141,7 @@ export const App: React.FC = () => {
     } catch {
       // ignore
     }
+    sendPushNotification('🚪 Sessão Encerrada', 'Você saiu com segurança da sua conta Cabral Locações.');
   };
 
   // Add new vehicle to fleet & inventory
@@ -150,91 +154,112 @@ export const App: React.FC = () => {
     );
   };
 
-  // Edit existing vehicle
+  // Save edited vehicle
   const handleSaveEditedVehicle = (updatedVehicle: Vehicle) => {
     const updated = vehicles.map(v => v.id === updatedVehicle.id ? updatedVehicle : v);
     persistVehicles(updated);
     sendPushNotification(
-      '✏️ Veículo Atualizado!',
-      `${updatedVehicle.model} (${updatedVehicle.plate}) foi atualizado com sucesso.`
+      '✏️ Carro Atualizado!',
+      `${updatedVehicle.model} (${updatedVehicle.plate}) teve suas informações e fotos salvas.`
     );
   };
 
-  // Delete vehicle from inventory
+  // Delete vehicle from fleet
   const handleDeleteVehicle = (vehicleId: string) => {
+    const target = vehicles.find(v => v.id === vehicleId);
     const updated = vehicles.filter(v => v.id !== vehicleId);
     persistVehicles(updated);
     sendPushNotification(
-      '🗑️ Veículo Removido',
-      'Veículo removido do estoque da Cabral Locações.'
+      '🗑️ Carro Removido',
+      `Veículo ${target?.model || ''} (${target?.plate || ''}) foi removido da frota.`
     );
   };
 
-  // Add new contract (starts a rental)
+  // Add new rental contract
   const handleAddContract = (newContract: Contract) => {
     setContracts(prev => [newContract, ...prev]);
-    // Mark vehicle as rented
-    setVehicles(prev => prev.map(v => 
-      v.id === newContract.vehicleId || v.plate === newContract.vehiclePlate 
-        ? { ...v, status: 'rented', currentDriver: newContract.driverName } 
-        : v
-    ));
+    // Mark vehicle as rented with current driver
+    const updatedVehicles = vehicles.map(v => {
+      if (v.plate === newContract.vehiclePlate) {
+        return {
+          ...v,
+          status: 'rented' as const,
+          currentDriver: newContract.driverName
+        };
+      }
+      return v;
+    });
+    persistVehicles(updatedVehicles);
+
     sendPushNotification(
-      '🔑 Nova Locação Confirmada!',
-      `Carro ${newContract.vehicleModel} entregue para o motorista ${newContract.driverName}.`
+      '🔑 Nova Locação Concluída!',
+      `Veículo ${newContract.vehiclePlate} retirado por ${newContract.driverName}.`
     );
   };
 
-  // End contract (returns car, refunds deposit, adds to past rentals)
-  const handleEndRental = (contractId: string, endKm: number, notes: string) => {
+  // End rental contract & create historical record
+  const handleEndRental = (contractId: string, endKm: number, conditionNotes: string) => {
     const contract = contracts.find(c => c.id === contractId);
     if (!contract) return;
 
     const vehicle = vehicles.find(v => v.plate === contract.vehiclePlate);
-    const startKm = vehicle ? Math.max(0, endKm - (contract.weeksRented * 1200)) : 0;
-    const totalKmDriven = endKm - startKm;
+    const startKm = vehicle ? vehicle.currentKm : endKm - 1200;
+    const totalKmDriven = Math.max(0, endKm - startKm);
 
-    const newPast: PastRental = {
+    const pastRecord: PastRental = {
       id: `past-${Date.now()}`,
-      vehiclePlate: contract.vehiclePlate,
-      vehicleModel: contract.vehicleModel,
+      contractId: contract.id,
       driverName: contract.driverName,
       driverPhone: contract.driverPhone,
       driverCnh: contract.driverCnh,
-      startDate: new Date(Date.now() - contract.weeksRented * 7 * 24 * 60 * 60 * 1000).toLocaleDateString('pt-BR'),
+      vehicleModel: contract.vehicleModel,
+      vehiclePlate: contract.vehiclePlate,
+      startDate: '01/08/2026',
       endDate: new Date().toLocaleDateString('pt-BR'),
-      totalWeeks: contract.weeksRented,
-      totalPaid: contract.rate * contract.weeksRented,
+      totalWeeks: contract.weeksRented || 1,
+      durationWeeks: contract.weeksRented || 1,
+      totalPaid: (contract.rate * (contract.weeksRented || 1)),
       depositAmount: contract.depositAmount || 800,
       depositStatus: 'refunded',
       startKm,
       endKm,
       totalKmDriven,
-      conditionNotes: notes
+      conditionNotes
     };
 
-    setPastRentals(prev => [newPast, ...prev]);
+    setPastRentals(prev => [pastRecord, ...prev]);
     setContracts(prev => prev.filter(c => c.id !== contractId));
-    
-    // Free the vehicle and update its KM
-    setVehicles(prev => prev.map(v => 
-      v.plate === contract.vehiclePlate 
-        ? { ...v, status: 'available', currentKm: endKm, currentDriver: undefined } 
-        : v
-    ));
+
+    // Release vehicle back to available status with new endKm
+    const updatedVehicles = vehicles.map(v => {
+      if (v.plate === contract.vehiclePlate) {
+        return {
+          ...v,
+          status: 'available' as const,
+          currentKm: endKm,
+          currentDriver: undefined
+        };
+      }
+      return v;
+    });
+    persistVehicles(updatedVehicles);
 
     sendPushNotification(
-      '✅ Devolução Concluída',
-      `Carro ${contract.vehiclePlate} devolvido por ${contract.driverName}. Caução liberada no PIX.`
+      '🏁 Devolução de Veículo Concluída',
+      `Veículo ${contract.vehiclePlate} devolvido com ${endKm} km. Caução liberada no PIX!`
     );
   };
 
-  // Real-time odometer update (triggered by driver photo OCR or admin edit)
+  // Real-time update of odometer
   const handleUpdateOdometer = (plate: string, newKm: number) => {
-    // 1. Update vehicle odometer
-    setVehicles(prev => prev.map(v => v.plate === plate ? { ...v, currentKm: newKm } : v));
+    const updatedVehicles = vehicles.map(v => {
+      if (v.plate === plate) {
+        return { ...v, currentKm: newKm };
+      }
+      return v;
+    });
+    persistVehicles(updatedVehicles);
 
-    // 2. Recalculate maintenance countdowns and status for this vehicle
     setMaintenanceRules(prev => prev.map(rule => {
       if (rule.vehiclePlate === plate) {
         const calc = calculateRemainingKm(newKm, rule.initialKm, rule.intervalKm);
@@ -272,6 +297,7 @@ export const App: React.FC = () => {
   };
 
   const isLight = settings.theme === 'light';
+  const isAdmin = Boolean(isAdminAuthenticated && userProfile?.role === 'admin');
 
   return (
     <div className={`min-h-screen font-sans antialiased ${
@@ -280,7 +306,15 @@ export const App: React.FC = () => {
       {/* Top Navigation */}
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={(tab) => {
+          // Bloqueio rigoroso de rotas administrativas para usuários não autenticados
+          const adminTabs = ['dashboard', 'locacoes', 'frota', 'manutencao', 'insights', 'empresa'];
+          if (adminTabs.includes(tab) && !isAdmin) {
+            handleOpenAuth('admin');
+            return;
+          }
+          setActiveTab(tab as any);
+        }}
         userRole={userRole}
         userProfile={userProfile}
         onOpenAuthModal={handleOpenAuth}
@@ -289,7 +323,7 @@ export const App: React.FC = () => {
         onOpenSettings={() => setIsSettingsOpen(true)}
         theme={settings.theme}
         onToggleTheme={handleToggleTheme}
-        isAdminAuthenticated={isAdminAuthenticated}
+        isAdminAuthenticated={isAdmin}
         isDriverAuthenticated={isDriverAuthenticated}
       />
 
@@ -299,7 +333,7 @@ export const App: React.FC = () => {
           <PublicLandingPage
             onOpenContactHub={() => setIsContactHubOpen(true)}
             onGoToDashboard={() => {
-              if (isAdminAuthenticated) {
+              if (isAdmin) {
                 setActiveTab('dashboard');
               } else {
                 handleOpenAuth('admin');
@@ -308,6 +342,11 @@ export const App: React.FC = () => {
             onOpenDriverAuth={() => handleOpenAuth('driver')}
             theme={settings.theme}
             vehicles={vehicles}
+            isAdmin={isAdmin}
+            onEditVehicle={(vehicle) => {
+              setEditingVehicle(vehicle);
+              setIsEditVehicleOpen(true);
+            }}
           />
         )}
 
@@ -359,6 +398,16 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        {activeTab === 'empresa' && (
+          <div className="p-4 sm:p-6 lg:p-8">
+            <CompanySettingsTab
+              settings={settings}
+              onUpdateSettings={handleUpdateSettings}
+              isLight={isLight}
+            />
+          </div>
+        )}
+
         {activeTab === 'motorista' && (
           <div className="p-4 sm:p-6 lg:p-8">
             <DriverPortal
@@ -404,12 +453,9 @@ export const App: React.FC = () => {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSettings={handleUpdateSettings}
-        isAdmin={Boolean(isAdminAuthenticated && userProfile?.role === 'admin')}
-        onOpenAdminAuth={() => handleOpenAuth('admin')}
       />
     </div>
   );
 };
 
 export default App;
-

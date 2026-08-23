@@ -8,38 +8,27 @@ interface SettingsModalProps {
   onClose: () => void;
   settings: AppSettings;
   onUpdateSettings: (newSettings: AppSettings) => void;
-  isAdmin?: boolean;
-  onOpenAdminAuth?: () => void;
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose,
   settings,
-  onUpdateSettings,
-  isAdmin = false,
-  onOpenAdminAuth
+  onUpdateSettings
 }) => {
   const [theme, setTheme] = useState<ThemeMode>(settings.theme);
-  const [companyName, setCompanyName] = useState(settings.companyName);
-  const [pixKey, setPixKey] = useState(settings.pixKey);
-  const [whatsappPhone, setWhatsappPhone] = useState(settings.whatsappPhone);
-  
   const [notifStatus, setNotifStatus] = useState<string | null>(null);
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // Sincroniza o formulário sempre que o modal for aberto ou as props mudarem
+  // Sincroniza o tema sempre que o modal for aberto
   useEffect(() => {
     if (isOpen) {
       setTheme(settings.theme);
-      setCompanyName(settings.companyName);
-      setPixKey(settings.pixKey);
-      setWhatsappPhone(settings.whatsappPhone);
       setNotifStatus(null);
     }
-  }, [isOpen, settings, isAdmin]);
+  }, [isOpen, settings.theme]);
 
   if (!isOpen) return null;
 
@@ -50,7 +39,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       onUpdateSettings({ ...settings, notificationsEnabled: true });
       sendPushNotification(
         '🔔 Cabral Locações',
-        'Notificações ativadas! Você receberá alertas de faturas e novas leituras de KM.'
+        'Notificações ativadas! Você receberá alertas de faturas e novas leituras de KM em tempo real.'
       );
     } else {
       setNotifStatus('⚠️ Permissão negada ou não suportada pelo navegador.');
@@ -84,29 +73,24 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     if (cameraStream) {
       stopCameraStream(cameraStream);
     }
-    
-    // Trava de segurança: somente admin pode atualizar dados cadastrais e financeiros
     onUpdateSettings({
       ...settings,
-      theme,
-      companyName: isAdmin ? companyName : settings.companyName,
-      pixKey: isAdmin ? pixKey : settings.pixKey,
-      whatsappPhone: isAdmin ? whatsappPhone : settings.whatsappPhone
+      theme
     });
     onClose();
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-brand-dark/85 backdrop-blur-md animate-in fade-in">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-in fade-in">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden text-white">
         
         {/* Modal Header */}
         <div className="bg-slate-950 p-6 relative border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <BrandLogo size="sm" theme="dark" />
             <div>
-              <h3 className="text-base font-black text-white font-display">Configurações do Sistema</h3>
-              <p className="text-xs text-slate-400">Personalização, Temas e Permissões de Dispositivo</p>
+              <h3 className="text-base font-black text-white font-display">Preferências & Dispositivo</h3>
+              <p className="text-xs text-slate-400">Tema Visual, Notificações e Câmera</p>
             </div>
           </div>
           <button
@@ -121,12 +105,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSave} className="p-6 space-y-6 max-h-[75vh] overflow-y-auto">
+        <form onSubmit={handleSave} className="p-6 space-y-6">
           
           {/* 1. Theme Selector */}
           <div className="space-y-2">
             <label className="text-xs font-black text-brand-cyan uppercase tracking-wider block">
-              🎨 Tema da Interface
+              🎨 Modo de Visualização (Tema)
             </label>
             <div className="grid grid-cols-2 gap-3">
               <button
@@ -134,7 +118,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onClick={() => setTheme('dark')}
                 className={`p-3.5 rounded-2xl border flex items-center justify-center space-x-2 transition-all cursor-pointer ${
                   theme === 'dark'
-                    ? 'bg-slate-950 border-brand-500 text-white shadow-lg shadow-brand-500/20 font-bold'
+                    ? 'bg-slate-950 border-blue-500 text-white shadow-lg shadow-blue-500/20 font-black'
                     : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
@@ -147,7 +131,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 onClick={() => setTheme('light')}
                 className={`p-3.5 rounded-2xl border flex items-center justify-center space-x-2 transition-all cursor-pointer ${
                   theme === 'light'
-                    ? 'bg-slate-800 border-brand-cyan text-white shadow-lg shadow-brand-cyan/20 font-bold'
+                    ? 'bg-slate-800 border-cyan-400 text-white shadow-lg shadow-cyan-400/20 font-black'
                     : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:text-white'
                 }`}
               >
@@ -160,7 +144,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* 2. Device Permissions (Push Notifications & Camera) */}
           <div className="space-y-3 border-t border-slate-800 pt-4">
             <label className="text-xs font-black text-brand-cyan uppercase tracking-wider block">
-              📱 Permissões de Dispositivo & Notificações
+              📱 Permissões de Notificações & Câmera
             </label>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -172,7 +156,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span>Notificações no Celular</span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Receba avisos de faturas e novas fotos de painel enviadas.
+                    Receba avisos de faturas, alertas e atualizações de KM no celular.
                   </p>
                 </div>
                 <button
@@ -180,7 +164,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClick={handleRequestNotif}
                   className="w-full btn-primary py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
                 >
-                  🔔 Permitir & Testar Notificação
+                  🔔 Ativar Notificações
                 </button>
               </div>
 
@@ -192,7 +176,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     <span>Permissão de Câmera</span>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Permita o uso da câmera para leitura de odômetro por IA e fotos de vistoria.
+                    Permita a câmera para leitura de KM com IA Gemini e fotos de vistoria.
                   </p>
                 </div>
                 <button
@@ -204,13 +188,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       : 'btn-cyan'
                   }`}
                 >
-                  {cameraActive ? '⏹️ Fechar Câmera' : '📸 Ativar / Testar Câmera'}
+                  {cameraActive ? '⏹️ Fechar Câmera' : '📸 Testar Câmera'}
                 </button>
               </div>
             </div>
 
             {notifStatus && (
-              <div className="p-2.5 bg-brand-500/20 border border-brand-500/30 text-brand-cyan rounded-xl text-xs font-bold text-center animate-in fade-in">
+              <div className="p-2.5 bg-blue-600/20 border border-blue-500/30 text-blue-300 rounded-xl text-xs font-bold text-center animate-in fade-in">
                 {notifStatus}
               </div>
             )}
@@ -231,102 +215,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             )}
           </div>
 
-          {/* 3. Company Settings (Protected by Admin Role) */}
-          <div className="space-y-3 border-t border-slate-800 pt-4">
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-black text-brand-cyan uppercase tracking-wider block">
-                🏢 Dados Oficiais da Cabral Locações
-              </label>
-              {isAdmin ? (
-                <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
-                  <span>🛡️</span>
-                  <span>Admin Verificado</span>
-                </span>
-              ) : (
-                <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
-                  <span>🔒</span>
-                  <span>Protegido (Somente Admin)</span>
-                </span>
-              )}
-            </div>
-
-            {!isAdmin && (
-              <div className="p-3.5 bg-amber-500/15 border border-amber-500/30 rounded-2xl space-y-2.5">
-                <p className="text-[11px] text-amber-200 leading-relaxed font-medium">
-                  🔒 <strong>Proteção Financeira Ativa:</strong> A Chave PIX e o WhatsApp Oficial são dados financeiros e só podem ser alterados por um administrador autenticado da Cabral Locações.
-                </p>
-                {onOpenAdminAuth && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onClose();
-                      onOpenAdminAuth();
-                    }}
-                    className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition-colors cursor-pointer shadow-md"
-                  >
-                    🔑 Entrar como Administrador para Editar PIX
-                  </button>
-                )}
-              </div>
-            )}
-
-            <div>
-              <label className="text-xs font-bold text-slate-300 block mb-1">Razão Social / Nome Fantasia</label>
-              <input
-                type="text"
-                disabled={!isAdmin}
-                readOnly={!isAdmin}
-                value={companyName}
-                onChange={(e) => setCompanyName(e.target.value)}
-                className={`w-full border text-xs rounded-xl px-3.5 py-2.5 ${
-                  isAdmin 
-                    ? 'bg-slate-950 border-slate-700 text-white focus:ring-2 focus:ring-brand-500' 
-                    : 'bg-slate-950/60 border-slate-800 text-slate-400 opacity-80 cursor-not-allowed'
-                }`}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1 flex items-center justify-between">
-                  <span>Chave PIX da Locadora</span>
-                  {!isAdmin && <span className="text-[10px] text-amber-400 font-normal">🔒 Bloqueado</span>}
-                </label>
-                <input
-                  type="text"
-                  disabled={!isAdmin}
-                  readOnly={!isAdmin}
-                  value={pixKey}
-                  onChange={(e) => setPixKey(e.target.value)}
-                  className={`w-full border text-xs rounded-xl px-3 py-2.5 font-mono ${
-                    isAdmin 
-                      ? 'bg-slate-950 border-slate-700 text-white focus:ring-2 focus:ring-brand-500' 
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 opacity-80 cursor-not-allowed'
-                  }`}
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1 flex items-center justify-between">
-                  <span>WhatsApp Oficial</span>
-                  {!isAdmin && <span className="text-[10px] text-amber-400 font-normal">🔒 Bloqueado</span>}
-                </label>
-                <input
-                  type="text"
-                  disabled={!isAdmin}
-                  readOnly={!isAdmin}
-                  value={whatsappPhone}
-                  onChange={(e) => setWhatsappPhone(e.target.value)}
-                  className={`w-full border text-xs rounded-xl px-3 py-2.5 font-mono font-bold ${
-                    isAdmin 
-                      ? 'bg-slate-950 border-slate-700 text-brand-cyan focus:ring-2 focus:ring-brand-500' 
-                      : 'bg-slate-950/60 border-slate-800 text-slate-400 opacity-80 cursor-not-allowed'
-                  }`}
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Action Buttons */}
           <div className="pt-3 flex items-center justify-end space-x-3 border-t border-slate-800">
             <button
@@ -343,7 +231,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               type="submit"
               className="btn-primary px-7 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer font-display"
             >
-              SALVAR CONFIGURAÇÕES
+              SALVAR PREFERÊNCIAS
             </button>
           </div>
         </form>

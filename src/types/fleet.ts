@@ -119,6 +119,7 @@ export interface TrafficFine {
 
 export interface PastRental {
   id: string;
+  contractId?: string;
   vehiclePlate: string;
   vehicleModel: string;
   driverName: string;
@@ -127,6 +128,7 @@ export interface PastRental {
   startDate: string;
   endDate: string;
   totalWeeks: number;
+  durationWeeks?: number;
   totalPaid: number;
   depositAmount: number;
   depositStatus: 'refunded' | 'retained';
@@ -146,6 +148,10 @@ export interface AppSettings {
   pixKey: string;
   whatsappPhone: string;
   defaultDepositAmount: number;
+  address?: string;
+  supportHours?: string;
+  defaultWeeklyRate?: number;
+  defaultDeposit?: number;
 }
 
 export interface DriverScore {

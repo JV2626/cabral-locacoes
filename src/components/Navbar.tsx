@@ -14,8 +14,8 @@ import {
 } from './Icons';
 
 interface NavbarProps {
-  activeTab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista';
-  setActiveTab: (tab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista') => void;
+  activeTab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista' | 'empresa';
+  setActiveTab: (tab: 'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'locacoes' | 'motorista' | 'empresa') => void;
   userRole: 'admin' | 'driver';
   userProfile: UserProfile | null;
   onOpenAuthModal: (role?: 'admin' | 'driver') => void;
@@ -148,7 +148,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   }`}
                 >
                   <SparklesIcon className="w-3.5 h-3.5" />
-                  <span>Insights</span>
+                  <span>IA Insights</span>
+                </button>
+                <button
+                  onClick={() => setActiveTab('empresa')}
+                  className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'empresa'
+                      ? 'bg-emerald-600 text-white shadow-md font-black'
+                      : isLight
+                        ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <span>🏢</span>
+                  <span>Empresa & PIX</span>
                 </button>
               </>
             ) : (
