@@ -27,7 +27,7 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
   const [simulatorHours, setSimulatorHours] = useState(8);
   const [simulatorCarType, setSimulatorCarType] = useState('sedan');
   
-  // Smooth subtle brand transition (without harsh background container)
+  // Ultra-smooth subtle brand transition
   const [brandIndex, setBrandIndex] = useState(0);
   const [isFading, setIsFading] = useState(false);
 
@@ -35,12 +35,12 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
     {
       id: 'both',
       node: (
-        <span className="inline-flex items-center align-middle gap-2 mx-1.5">
-          <span className="inline-flex items-center px-3 py-0.5 sm:px-3.5 sm:py-1 bg-black text-white text-base sm:text-2xl font-black rounded-xl border border-slate-700/80 shadow-md font-sans">
+        <span className="inline-flex items-center align-middle gap-2 mx-1.5 transition-all">
+          <span className="inline-flex items-center px-3.5 py-1 bg-black text-white text-base sm:text-2xl font-black rounded-xl border border-slate-700/80 shadow-md font-sans hover:border-slate-500 transition-colors">
             Uber
           </span>
           <span className="text-slate-400 font-extrabold text-sm sm:text-lg">&</span>
-          <span className="inline-flex items-center px-3 py-0.5 sm:px-3.5 sm:py-1 bg-[#FFCC00] text-black text-base sm:text-2xl font-black rounded-xl shadow-md font-sans">
+          <span className="inline-flex items-center px-3.5 py-1 bg-[#FFCC00] text-black text-base sm:text-2xl font-black rounded-xl shadow-md font-sans hover:brightness-105 transition-all">
             99
           </span>
         </span>
@@ -49,8 +49,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
     {
       id: 'uber',
       node: (
-        <span className="inline-flex items-center align-middle mx-1.5">
-          <span className="inline-flex items-center px-4 py-0.5 sm:px-5 sm:py-1 bg-black text-white text-base sm:text-2xl font-black rounded-xl border border-slate-700/80 shadow-md font-sans">
+        <span className="inline-flex items-center align-middle mx-1.5 transition-all">
+          <span className="inline-flex items-center px-5 py-1 bg-black text-white text-base sm:text-2xl font-black rounded-xl border border-slate-700/80 shadow-md font-sans hover:border-slate-500 transition-colors">
             Uber
           </span>
         </span>
@@ -59,8 +59,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
     {
       id: '99',
       node: (
-        <span className="inline-flex items-center align-middle mx-1.5">
-          <span className="inline-flex items-center px-4 py-0.5 sm:px-5 sm:py-1 bg-[#FFCC00] text-black text-base sm:text-2xl font-black rounded-xl shadow-md font-sans">
+        <span className="inline-flex items-center align-middle mx-1.5 transition-all">
+          <span className="inline-flex items-center px-5 py-1 bg-[#FFCC00] text-black text-base sm:text-2xl font-black rounded-xl shadow-md font-sans hover:brightness-105 transition-all">
             99 App
           </span>
         </span>
@@ -74,8 +74,8 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
       setTimeout(() => {
         setBrandIndex((prev) => (prev + 1) % brandOptions.length);
         setIsFading(false);
-      }, 250);
-    }, 3200);
+      }, 400);
+    }, 4500);
     return () => clearInterval(timer);
   }, [brandOptions.length]);
 
@@ -111,10 +111,10 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
               <span>Locação Especializada para Motoristas de App</span>
             </div>
 
-            {/* Main Headline with Clean & Smoothly Animated Logos */}
+            {/* Main Headline with Ultra-Smooth Animated Logos */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight font-display">
               Alugue seu carro para rodar na{' '}
-              <span className={`inline-block transition-all duration-300 ease-in-out ${isFading ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0'}`}>
+              <span className={`inline-block transition-all duration-500 ease-in-out ${isFading ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
                 {brandOptions[brandIndex].node}
               </span>{' '}
               sem burocracia
