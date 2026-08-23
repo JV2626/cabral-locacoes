@@ -352,8 +352,19 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
         <div className="flex justify-center">
           <BrandLogo size="md" />
         </div>
-        <p className="font-extrabold text-slate-400">CABRAL LOCAÇÕES DE VEÍCULOS LTDA</p>
-        <p className="max-w-md mx-auto">Locação Especializada para Motoristas de Aplicativo (Uber, 99) e Frotas Comerciais.</p>
+        <p className="font-extrabold text-slate-300">CABRAL LOCAÇÕES DE VEÍCULOS LTDA</p>
+        <p className="max-w-md mx-auto text-slate-400">Locação Especializada para Motoristas de Aplicativo (Uber, 99) e Frotas Comerciais.</p>
+        <div className="pt-2">
+          <a
+            href="https://wa.me/5511982886032?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20carros%20disponíveis%20na%20Cabral%20Locações."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center space-x-2 text-[#25D366] hover:text-[#20bd5a] font-bold text-xs bg-slate-900 border border-slate-800 hover:border-[#25D366]/40 px-4 py-2 rounded-xl transition-all"
+          >
+            <WhatsAppIcon className="w-4 h-4 fill-[#25D366]" />
+            <span>WhatsApp Oficial: +55 (11) 98288-6032</span>
+          </a>
+        </div>
       </footer>
     </div>
   );

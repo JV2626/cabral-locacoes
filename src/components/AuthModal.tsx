@@ -59,7 +59,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         onLoginSuccess({
           name: 'Diretoria Cabral',
           email: adminEmail,
-          phone: '(11) 99999-9999',
+          phone: '(11) 98288-6032',
           cnh: '00000000000',
           role: 'admin'
         });

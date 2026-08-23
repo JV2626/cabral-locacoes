@@ -45,12 +45,17 @@ export const ContactHubModal: React.FC<ContactHubModalProps> = ({ isOpen, onClos
               <WhatsAppIcon className="w-6 h-6 fill-white" />
             </div>
             <h4 className="text-base font-black text-white font-display">Quer falar direto com a nossa equipe?</h4>
-            <p className="text-xs text-slate-300">Sem filas, sem robôs de 0800. Atendimento humano rápido no WhatsApp oficial:</p>
+            <p className="text-xs text-slate-300">
+              Sem filas, sem robôs de 0800. Atendimento humano rápido no WhatsApp oficial:
+            </p>
+            <div className="inline-block bg-slate-950/80 border border-slate-800 px-3 py-1 rounded-lg text-xs font-mono font-bold text-[#25D366]">
+              +55 (11) 98288-6032
+            </div>
             <a
-              href="https://wa.me/5511999999999?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20carros%20disponíveis%20na%20Cabral%20Locações."
+              href="https://wa.me/5511982886032?text=Olá!%20Gostaria%20de%20saber%20mais%20sobre%20os%20carros%20disponíveis%20na%20Cabral%20Locações."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center space-x-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3.5 rounded-xl font-black text-xs transition-all shadow-lg shadow-[#25D366]/25 active:scale-95 w-full uppercase tracking-wider"
+              className="inline-flex items-center justify-center space-x-2.5 bg-[#25D366] hover:bg-[#20bd5a] text-white px-6 py-3.5 rounded-xl font-black text-xs transition-all shadow-lg shadow-[#25D366]/25 active:scale-95 w-full uppercase tracking-wider cursor-pointer"
             >
               <WhatsAppIcon className="w-4 h-4 fill-white" />
               <span>Abrir WhatsApp da Cabral Locações</span>
