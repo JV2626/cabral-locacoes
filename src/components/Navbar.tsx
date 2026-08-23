@@ -6,6 +6,8 @@ interface NavbarProps {
   userRole: 'admin' | 'driver';
   setUserRole: (role: 'admin' | 'driver') => void;
   onOpenContactHub: () => void;
+  onSelectAdminRole: () => void;
+  isAdminAuthenticated: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -13,10 +15,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   setActiveTab,
   userRole,
   setUserRole,
-  onOpenContactHub
+  onOpenContactHub,
+  onSelectAdminRole,
+  isAdminAuthenticated
 }) => {
   return (
-    <header className="sticky top-0 z-50 bg-slate-900 border-b border-slate-800 text-white shadow-md">
+    <header className="sticky top-0 z-40 bg-slate-900 border-b border-slate-800 text-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
@@ -30,7 +34,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
           </div>
 
-          {/* Navigation Tabs (Admin vs Driver) */}
+          {/* Navigation Tabs */}
           <nav className="hidden md:flex items-center space-x-1 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60">
             <button
               onClick={() => setActiveTab('public')}
@@ -43,7 +47,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               🌐 Site da Marca
             </button>
 
-            {userRole === 'admin' ? (
+            {userRole === 'admin' && isAdminAuthenticated ? (
               <>
                 <button
                   onClick={() => setActiveTab('dashboard')}
@@ -105,17 +109,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* User Role Switcher Dropdown */}
             <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl p-1 text-xs">
               <button
-                onClick={() => {
-                  setUserRole('admin');
-                  if (activeTab === 'motorista') setActiveTab('dashboard');
-                }}
+                onClick={onSelectAdminRole}
                 className={`px-2.5 py-1 rounded-lg font-bold transition-all ${
-                  userRole === 'admin'
+                  userRole === 'admin' && isAdminAuthenticated
                     ? 'bg-blue-600 text-white shadow-xs'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                👑 Admin
+                {isAdminAuthenticated ? '👑 Admin (Logado)' : '🔒 Entrar como Admin'}
               </button>
               <button
                 onClick={() => {

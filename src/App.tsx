@@ -7,11 +7,29 @@ import { AiCopilotAndInsights } from './components/AiCopilotAndInsights';
 import { FleetTableWithExport } from './components/FleetTableWithExport';
 import { DriverPortal } from './components/DriverPortal';
 import { ContactHubModal } from './components/ContactHubModal';
+import { AdminLoginModal } from './components/AdminLoginModal';
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista'>('dashboard');
-  const [userRole, setUserRole] = useState<'admin' | 'driver'>('admin');
+  const [activeTab, setActiveTab] = useState<'public' | 'dashboard' | 'manutencao' | 'insights' | 'frota' | 'motorista'>('public');
+  const [userRole, setUserRole] = useState<'admin' | 'driver'>('driver');
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [isAdminLoginModalOpen, setIsAdminLoginModalOpen] = useState(false);
   const [isContactHubOpen, setIsContactHubOpen] = useState(false);
+
+  const handleSelectAdminRole = () => {
+    if (!isAdminAuthenticated) {
+      setIsAdminLoginModalOpen(true);
+    } else {
+      setUserRole('admin');
+      setActiveTab('dashboard');
+    }
+  };
+
+  const handleAdminLoginSuccess = () => {
+    setIsAdminAuthenticated(true);
+    setUserRole('admin');
+    setActiveTab('dashboard');
+  };
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-slate-950">
@@ -22,6 +40,8 @@ export const App: React.FC = () => {
         userRole={userRole}
         setUserRole={setUserRole}
         onOpenContactHub={() => setIsContactHubOpen(true)}
+        onSelectAdminRole={handleSelectAdminRole}
+        isAdminAuthenticated={isAdminAuthenticated}
       />
 
       {/* Main Content Area */}
@@ -29,7 +49,13 @@ export const App: React.FC = () => {
         {activeTab === 'public' && (
           <PublicLandingPage
             onOpenContactHub={() => setIsContactHubOpen(true)}
-            onGoToDashboard={() => setActiveTab(userRole === 'admin' ? 'dashboard' : 'motorista')}
+            onGoToDashboard={() => {
+              if (isAdminAuthenticated) {
+                setActiveTab('dashboard');
+              } else {
+                setIsAdminLoginModalOpen(true);
+              }
+            }}
           />
         )}
 
@@ -64,10 +90,16 @@ export const App: React.FC = () => {
         )}
       </main>
 
-      {/* Contact Hub Modal */}
+      {/* Modals */}
       <ContactHubModal
         isOpen={isContactHubOpen}
         onClose={() => setIsContactHubOpen(false)}
+      />
+
+      <AdminLoginModal
+        isOpen={isAdminLoginModalOpen}
+        onClose={() => setIsAdminLoginModalOpen(false)}
+        onLoginSuccess={handleAdminLoginSuccess}
       />
     </div>
   );
