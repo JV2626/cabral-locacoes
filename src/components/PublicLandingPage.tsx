@@ -160,9 +160,9 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center relative z-10">
               <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between text-xs font-bold text-slate-300 mb-2">
+                  <div className="flex justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
                     <span>Horas rodadas por dia:</span>
-                    <span className="text-brand-cyan font-black text-sm">{simulatorHours} horas/dia</span>
+                    <span className="text-blue-700 dark:text-brand-cyan font-black text-sm">{simulatorHours} horas/dia</span>
                   </div>
                   <input
                     type="range"
@@ -170,48 +170,48 @@ export const PublicLandingPage: React.FC<PublicLandingPageProps> = ({
                     max="14"
                     value={simulatorHours}
                     onChange={(e) => setSimulatorHours(parseInt(e.target.value))}
-                    className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-cyan"
+                    className="w-full h-2 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-500"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-300 block mb-2">Categoria do Veículo:</label>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-2">Categoria do Veículo:</label>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setSimulatorCarType('hatch')}
                       className={`p-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         simulatorCarType === 'hatch'
-                          ? 'bg-brand-500/20 border-brand-500 text-brand-300 shadow-md shadow-brand-500/20'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
+                          ? 'bg-blue-50 dark:bg-brand-500/20 border-brand-500 text-blue-800 dark:text-brand-300 shadow-md shadow-brand-500/20'
+                          : 'bg-slate-100 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       <span className="font-extrabold block">🚗 Hatch (Onix/HB20)</span>
-                      <span className="block text-[10px] text-slate-400 font-normal mt-0.5">R$ 490/semana</span>
+                      <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5">R$ 490/semana</span>
                     </button>
                     <button
                       onClick={() => setSimulatorCarType('sedan')}
                       className={`p-3 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
                         simulatorCarType === 'sedan'
-                          ? 'bg-brand-500/20 border-brand-500 text-brand-300 shadow-md shadow-brand-500/20'
-                          : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-white'
+                          ? 'bg-blue-50 dark:bg-brand-500/20 border-brand-500 text-blue-800 dark:text-brand-300 shadow-md shadow-brand-500/20'
+                          : 'bg-slate-100 dark:bg-slate-950/60 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
                       <span className="font-extrabold block">🚘 Sedã (Cronos/Onix+)</span>
-                      <span className="block text-[10px] text-slate-400 font-normal mt-0.5">R$ 560/semana</span>
+                      <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-normal mt-0.5">R$ 560/semana</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               {/* Result Card */}
-              <div className="bg-gradient-to-br from-brand-900/80 via-slate-900 to-slate-950 p-6 rounded-2xl border border-brand-500/30 space-y-3 text-center sm:text-left shadow-lg shadow-brand-500/10">
-                <span className="text-[11px] font-black text-brand-cyan uppercase tracking-wide block">
+              <div className="bg-gradient-to-br from-blue-50/90 via-white to-slate-50 dark:from-brand-900/80 dark:via-slate-900 dark:to-slate-950 p-6 rounded-2xl border border-blue-200 dark:border-brand-500/30 space-y-3 text-center sm:text-left shadow-lg shadow-brand-500/10">
+                <span className="text-[11px] font-black text-blue-700 dark:text-brand-cyan uppercase tracking-wide block">
                   Lucro Líquido Mensal Estimado:
                 </span>
-                <span className="text-3xl sm:text-4xl font-black text-white block">
+                <span className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white block">
                   {formatCurrency(Math.max(2800, estimatedMonthlyNet))}
                 </span>
-                <p className="text-xs text-slate-400 leading-snug">
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-snug">
                   *Já descontado o valor da semanalidade e o combustível estimado. Sem custos com seguro, IPVA ou troca de óleo!
                 </p>
                 <button

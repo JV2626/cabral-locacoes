@@ -2,19 +2,29 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+@layer base {
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  }
 }
 
-/* Global Light Theme Dynamic Overrides */
+/* ==========================================================================
+   LIGHT THEME DESIGN SYSTEM (Cabral Locações - Clean Blue & White)
+   ========================================================================== */
+
 html.light,
+.light {
+  color-scheme: light;
+}
+
 html.light body,
 .light body {
   background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
+/* Surfaces and Cards in Light Mode */
 .light .bg-slate-900,
 .light .bg-brand-dark {
   background-color: #ffffff !important;
@@ -23,9 +33,20 @@ html.light body,
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
 }
 
-.light .bg-slate-950 {
+.light .bg-slate-950,
+.light .bg-slate-950\/90,
+.light .bg-slate-950\/80,
+.light .bg-slate-950\/70,
+.light .bg-slate-950\/60,
+.light .bg-slate-950\/50,
+.light .bg-slate-950\/40,
+.light .bg-slate-900\/90,
+.light .bg-slate-900\/80,
+.light .bg-slate-900\/70,
+.light .bg-slate-900\/60,
+.light .bg-slate-900\/50 {
   background-color: #f1f5f9 !important;
-  color: #1e293b !important;
+  color: #0f172a !important;
   border-color: #e2e8f0 !important;
 }
 
@@ -34,6 +55,7 @@ html.light body,
   border-color: #e2e8f0 !important;
 }
 
+/* Text Hierarchy & Contrast in Light Mode */
 .light .text-white {
   color: #0f172a !important;
 }
@@ -52,12 +74,53 @@ html.light body,
   color: #64748b !important;
 }
 
+/* Brand Blue & Cyan Accents (WCAG AA 4.5:1 Contrast) */
+.light .text-brand-cyan {
+  color: #0284c7 !important; /* Sky 600 */
+}
+
+.light .text-brand-300 {
+  color: #1d4ed8 !important; /* Blue 700 */
+}
+
+.light .text-amber-400,
+.light .text-amber-300 {
+  color: #b45309 !important; /* Amber 700 */
+}
+
+.light .text-rose-400,
+.light .text-rose-300 {
+  color: #dc2626 !important; /* Red 600 */
+}
+
+.light .text-emerald-400,
+.light .text-emerald-300 {
+  color: #15803d !important; /* Green 700 */
+}
+
+.light .text-purple-400,
+.light .text-purple-300 {
+  color: #7e22ce !important; /* Purple 700 */
+}
+
+.light .text-teal-400 {
+  color: #0f766e !important; /* Teal 700 */
+}
+
+/* Form Inputs, Selects & Textareas */
 .light input,
 .light select,
 .light textarea {
   background-color: #ffffff !important;
   color: #0f172a !important;
-  border-color: #cbd5e1 !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+.light input:focus,
+.light select:focus,
+.light textarea:focus {
+  border-color: #2563eb !important;
+  outline: 2px solid rgba(37, 99, 235, 0.2) !important;
 }
 
 .light input::placeholder,
@@ -65,14 +128,96 @@ html.light body,
   color: #94a3b8 !important;
 }
 
+/* Tables in Light Mode */
 .light thead {
   background-color: #f8fafc !important;
   color: #475569 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.light th {
+  color: #475569 !important;
+}
+
+.light td {
+  color: #1e293b !important;
+  border-bottom: 1px solid #f1f5f9 !important;
 }
 
 .light tbody tr:hover {
-  background-color: #f1f5f9 !important;
+  background-color: #f8fafc !important;
 }
+
+/* Badges & Status Chips in Light Mode */
+.light .bg-brand-500\/20,
+.light .bg-brand-500\/15,
+.light .bg-brand-500\/10 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+.light .bg-emerald-500\/20,
+.light .bg-emerald-500\/15 {
+  background-color: #f0fdf4 !important;
+  border-color: #bbf7d0 !important;
+  color: #15803d !important;
+}
+
+.light .bg-amber-500\/20,
+.light .bg-amber-500\/15,
+.light .bg-amber-600\/20 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #b45309 !important;
+}
+
+.light .bg-rose-500\/20,
+.light .bg-rose-500\/15 {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+.light .bg-purple-500\/20 {
+  background-color: #faf5ff !important;
+  border-color: #e9d5ff !important;
+  color: #7e22ce !important;
+}
+
+.light .bg-teal-500\/20 {
+  background-color: #f0fdfa !important;
+  border-color: #99f6e4 !important;
+  color: #0f766e !important;
+}
+
+.light .bg-blue-500\/20 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1d4ed8 !important;
+}
+
+/* Info Icon Circle */
+.light .bg-slate-800 {
+  background-color: #e2e8f0 !important;
+  color: #475569 !important;
+}
+
+/* Landing Simulator in Light Mode */
+.light .from-brand-900\/80 {
+  --tw-gradient-from: #eff6ff var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: #f8fafc var(--tw-gradient-to-position) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), #ffffff var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
+  background-color: #ffffff !important;
+  border-color: #bfdbfe !important;
+  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* Modal Backdrops and Containers */
+.light .bg-slate-900\/95 {
+  background-color: #ffffff !important;
+}
+
 
 
 

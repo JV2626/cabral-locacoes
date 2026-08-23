@@ -54,18 +54,18 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
       {/* Header with Title and Period Filter */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 p-6 rounded-3xl shadow-xl border border-slate-800">
         <div>
-          <span className="text-xs font-black text-brand-cyan uppercase tracking-widest block mb-1">
+          <span className="text-xs font-black text-blue-700 dark:text-brand-cyan uppercase tracking-widest block mb-1">
             Painel Executivo da Frota
           </span>
-          <h1 className="text-2xl font-black text-white tracking-tight font-display">Visão Geral & 10 KPIs</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight font-display">Visão Geral & 10 KPIs</h1>
         </div>
 
         <div className="flex items-center space-x-3">
-          <label className="text-xs font-bold text-slate-400">Período:</label>
+          <label className="text-xs font-bold text-slate-600 dark:text-slate-400">Período:</label>
           <select
             value={period}
             onChange={(e) => setPeriod(e.target.value)}
-            className="bg-slate-950 border border-slate-700 text-white text-xs font-bold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
+            className="bg-slate-950 border border-slate-700 text-slate-900 dark:text-white text-xs font-bold rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-brand-500 focus:outline-none cursor-pointer"
           >
             <option value="Mês Atual">Mês Atual</option>
             <option value="Mês Anterior">Mês Anterior</option>
@@ -77,7 +77,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
 
       {/* 10 Strategic KPI Cards Grid */}
       <div>
-        <h2 className="text-xs font-black text-brand-cyan uppercase tracking-wider mb-3 px-1">
+        <h2 className="text-xs font-black text-blue-700 dark:text-brand-cyan uppercase tracking-wider mb-3 px-1">
           Indicadores de Performance Operacional (10 KPIs)
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
