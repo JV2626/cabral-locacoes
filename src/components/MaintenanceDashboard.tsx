@@ -168,13 +168,13 @@ export const MaintenanceDashboard: React.FC = () => {
                 setServiceType('');
                 setAlertType('');
               }}
-              className="px-4 py-2 border border-slate-700 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-800 transition-colors cursor-pointer"
+              className="btn-secondary px-5 py-2.5 rounded-xl text-xs cursor-pointer"
             >
               Limpar
             </button>
             <button
               onClick={() => alert('Regra de manutenção salva com sucesso!')}
-              className="px-5 py-2.5 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-md shadow-brand-500/25 active:scale-95 cursor-pointer"
+              className="btn-primary px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer font-display"
             >
               Salvar Regra
             </button>

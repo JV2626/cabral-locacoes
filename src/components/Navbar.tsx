@@ -286,7 +286,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => onOpenAuthModal('driver')}
-                className="flex items-center space-x-2 bg-gradient-to-r from-brand-600 to-blue-600 hover:from-brand-700 hover:to-blue-700 text-white px-3.5 py-2 rounded-xl font-black text-xs transition-all shadow-md shadow-brand-500/25 active:scale-95 cursor-pointer"
+                className="btn-primary flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black cursor-pointer"
               >
                 <KeyIcon className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Entrar / Cadastrar</span>
@@ -297,7 +297,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Official WhatsApp Button */}
             <button
               onClick={onOpenContactHub}
-              className="flex items-center space-x-2 bg-[#25D366] hover:bg-[#20bd5a] text-white px-3.5 py-2 rounded-xl font-black text-xs transition-all shadow-md shadow-[#25D366]/25 active:scale-95 cursor-pointer shrink-0"
+              className="btn-success flex items-center space-x-2 px-4 py-2 rounded-xl text-xs font-black cursor-pointer shrink-0"
               title="Falar no WhatsApp Oficial"
             >
               <WhatsAppIcon className="w-4 h-4 fill-white" />

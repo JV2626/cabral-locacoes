@@ -404,7 +404,7 @@ export const App: React.FC = () => {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onUpdateSettings={handleUpdateSettings}
-        isAdmin={isAdminAuthenticated || userProfile?.role === 'admin'}
+        isAdmin={Boolean(isAdminAuthenticated && userProfile?.role === 'admin')}
         onOpenAdminAuth={() => handleOpenAuth('admin')}
       />
     </div>

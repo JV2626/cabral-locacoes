@@ -217,7 +217,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white font-black py-3 rounded-xl text-xs transition-all shadow-lg shadow-brand-500/30 active:scale-95 cursor-pointer disabled:opacity-50"
+                  className="w-full btn-primary py-3 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   {isLoading ? 'Autenticando...' : '🔑 Entrar no Painel Administrativo'}
                 </button>
@@ -240,7 +240,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     setDriverMode('login');
                     setErrorMessage('');
                   }}
-                  className={`flex-1 py-1.5 rounded-lg transition-all ${
+                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer ${
                     driverMode === 'login' ? 'bg-slate-800 text-white font-black' : 'text-slate-400 hover:text-white'
                   }`}
                 >
@@ -252,8 +252,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     setDriverMode('register');
                     setErrorMessage('');
                   }}
-                  className={`flex-1 py-1.5 rounded-lg transition-all ${
-                    driverMode === 'register' ? 'bg-brand-cyan text-slate-950 font-black' : 'text-slate-400 hover:text-white'
+                  className={`flex-1 py-1.5 rounded-lg transition-all cursor-pointer ${
+                    driverMode === 'register' ? 'btn-cyan text-slate-950 font-black' : 'text-slate-400 hover:text-white'
                   }`}
                 >
                   Quero Alugar (Novo Cadastro)
@@ -292,7 +292,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-brand-cyan hover:bg-brand-300 text-slate-950 font-black py-3 rounded-xl text-xs transition-all shadow-lg shadow-brand-cyan/20 active:scale-95 cursor-pointer disabled:opacity-50"
+                    className="w-full btn-cyan py-3 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer disabled:opacity-50"
                   >
                     {isLoading ? 'Verificando...' : step === 'phone' ? '📲 Enviar Código de Acesso' : '✅ Entrar no Portal do Motorista'}
                   </button>
@@ -364,7 +364,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-gradient-to-r from-brand-cyan to-brand-400 text-slate-950 font-black py-3 rounded-xl text-xs transition-all shadow-lg shadow-brand-cyan/20 active:scale-95 cursor-pointer disabled:opacity-50 mt-2"
+                    className="w-full btn-cyan py-3 rounded-xl text-xs font-black transition-all active:scale-95 cursor-pointer disabled:opacity-50 mt-2"
                   >
                     {isLoading ? 'Cadastrando...' : '🚀 Concluir Cadastro & Iniciar Retirada'}
                   </button>

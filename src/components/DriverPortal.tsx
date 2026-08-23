@@ -316,14 +316,14 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({
               <div className="flex gap-2">
                 <button
                   onClick={() => fileInputRef.current?.click()}
-                  className="flex-1 text-xs font-bold text-slate-300 border border-slate-700 hover:bg-slate-800 py-2 rounded-xl cursor-pointer"
+                  className="btn-secondary flex-1 text-xs py-2 rounded-xl cursor-pointer"
                 >
                   Trocar Foto
                 </button>
                 <button
                   onClick={handleRunOcr}
                   disabled={isScanning}
-                  className="flex-1 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 disabled:opacity-50 text-white font-bold py-2 rounded-xl text-xs shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="btn-primary flex-1 py-2 rounded-xl text-xs font-black disabled:opacity-50 cursor-pointer"
                 >
                   {isScanning ? 'Processando...' : '🔍 Analisar com IA'}
                 </button>
@@ -366,7 +366,7 @@ export const DriverPortal: React.FC<DriverPortalProps> = ({
           </div>
           <button
             onClick={onOpenContactHub}
-            className="bg-brand-cyan hover:bg-brand-300 text-slate-950 px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer shadow-sm"
+            className="btn-cyan px-4 py-2 rounded-xl text-xs font-black cursor-pointer"
           >
             Agendar na Oficina
           </button>

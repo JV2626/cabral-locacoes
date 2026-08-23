@@ -368,13 +368,13 @@ export const EditVehicleModal: React.FC<EditVehicleModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 border border-slate-700 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-800 transition-colors cursor-pointer"
+              className="btn-secondary px-5 py-2.5 rounded-xl text-xs cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white rounded-xl text-xs font-black transition-all shadow-lg shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
+              className="btn-primary px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider font-display cursor-pointer"
             >
               Salvar Alterações
             </button>

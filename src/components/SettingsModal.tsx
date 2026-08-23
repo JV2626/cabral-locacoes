@@ -1,8 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { AppSettings, ThemeMode } from '../types/fleet';
 import { requestNotificationPermission, sendPushNotification, requestCameraPermission, stopCameraStream } from '../lib/notifications';
 import { BrandLogo } from './BrandLogo';
-import { WhatsAppIcon, SparklesIcon, ShieldCheckIcon } from './Icons';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -30,6 +29,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [cameraActive, setCameraActive] = useState(false);
   const [cameraStream, setCameraStream] = useState<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Sincroniza o formulário sempre que o modal for aberto ou as props mudarem
+  useEffect(() => {
+    if (isOpen) {
+      setTheme(settings.theme);
+      setCompanyName(settings.companyName);
+      setPixKey(settings.pixKey);
+      setWhatsappPhone(settings.whatsappPhone);
+      setNotifStatus(null);
+    }
+  }, [isOpen, settings, isAdmin]);
 
   if (!isOpen) return null;
 
@@ -74,6 +84,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
     if (cameraStream) {
       stopCameraStream(cameraStream);
     }
+    
+    // Trava de segurança: somente admin pode atualizar dados cadastrais e financeiros
     onUpdateSettings({
       ...settings,
       theme,
@@ -166,9 +178,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   onClick={handleRequestNotif}
-                  className="w-full bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white font-black py-2 rounded-xl text-[11px] transition-all cursor-pointer shadow-md"
+                  className="w-full btn-primary py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
                 >
-                  Permitir & Testar Notificação
+                  🔔 Permitir & Testar Notificação
                 </button>
               </div>
 
@@ -186,10 +198,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 <button
                   type="button"
                   onClick={handleTestCamera}
-                  className={`w-full font-black py-2 rounded-xl text-[11px] transition-all cursor-pointer shadow-md ${
+                  className={`w-full py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer ${
                     cameraActive
                       ? 'bg-rose-600 hover:bg-rose-700 text-white'
-                      : 'bg-brand-cyan hover:bg-brand-300 text-slate-950'
+                      : 'btn-cyan'
                   }`}
                 >
                   {cameraActive ? '⏹️ Fechar Câmera' : '📸 Ativar / Testar Câmera'}
@@ -226,12 +238,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 🏢 Dados Oficiais da Cabral Locações
               </label>
               {isAdmin ? (
-                <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
+                <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
                   <span>🛡️</span>
                   <span>Admin Verificado</span>
                 </span>
               ) : (
-                <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
+                <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2.5 py-0.5 rounded-full flex items-center space-x-1">
                   <span>🔒</span>
                   <span>Protegido (Somente Admin)</span>
                 </span>
@@ -239,9 +251,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             {!isAdmin && (
-              <div className="p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl space-y-2">
-                <p className="text-[11px] text-amber-200 leading-snug">
-                  🔒 <strong>Segurança Ativa:</strong> A Chave PIX e o WhatsApp Oficial são dados financeiros sensíveis e só podem ser alterados por um administrador autorizado da Cabral Locações.
+              <div className="p-3.5 bg-amber-500/15 border border-amber-500/30 rounded-2xl space-y-2.5">
+                <p className="text-[11px] text-amber-200 leading-relaxed font-medium">
+                  🔒 <strong>Proteção Financeira Ativa:</strong> A Chave PIX e o WhatsApp Oficial são dados financeiros e só podem ser alterados por um administrador autenticado da Cabral Locações.
                 </p>
                 {onOpenAdminAuth && (
                   <button
@@ -250,7 +262,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onClose();
                       onOpenAdminAuth();
                     }}
-                    className="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-black py-2 rounded-xl text-xs transition-colors cursor-pointer"
+                    className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition-colors cursor-pointer shadow-md"
                   >
                     🔑 Entrar como Administrador para Editar PIX
                   </button>
@@ -263,47 +275,52 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               <input
                 type="text"
                 disabled={!isAdmin}
+                readOnly={!isAdmin}
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
-                className={`w-full border text-xs rounded-xl px-3.5 py-2.5 text-white ${
+                className={`w-full border text-xs rounded-xl px-3.5 py-2.5 ${
                   isAdmin 
-                    ? 'bg-slate-950 border-slate-700 focus:ring-2 focus:ring-brand-500' 
-                    : 'bg-slate-950/50 border-slate-800 opacity-75 cursor-not-allowed'
+                    ? 'bg-slate-950 border-slate-700 text-white focus:ring-2 focus:ring-brand-500' 
+                    : 'bg-slate-950/60 border-slate-800 text-slate-400 opacity-80 cursor-not-allowed'
                 }`}
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  Chave PIX da Locadora {!isAdmin && '🔒'}
+                <label className="text-xs font-bold text-slate-300 block mb-1 flex items-center justify-between">
+                  <span>Chave PIX da Locadora</span>
+                  {!isAdmin && <span className="text-[10px] text-amber-400 font-normal">🔒 Bloqueado</span>}
                 </label>
                 <input
                   type="text"
                   disabled={!isAdmin}
+                  readOnly={!isAdmin}
                   value={pixKey}
                   onChange={(e) => setPixKey(e.target.value)}
-                  className={`w-full border text-xs rounded-xl px-3 py-2 font-mono ${
+                  className={`w-full border text-xs rounded-xl px-3 py-2.5 font-mono ${
                     isAdmin 
                       ? 'bg-slate-950 border-slate-700 text-white focus:ring-2 focus:ring-brand-500' 
-                      : 'bg-slate-950/50 border-slate-800 text-slate-400 opacity-75 cursor-not-allowed'
+                      : 'bg-slate-950/60 border-slate-800 text-slate-400 opacity-80 cursor-not-allowed'
                   }`}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-300 block mb-1">
-                  WhatsApp Oficial {!isAdmin && '🔒'}
+                <label className="text-xs font-bold text-slate-300 block mb-1 flex items-center justify-between">
+                  <span>WhatsApp Oficial</span>
+                  {!isAdmin && <span className="text-[10px] text-amber-400 font-normal">🔒 Bloqueado</span>}
                 </label>
                 <input
                   type="text"
                   disabled={!isAdmin}
+                  readOnly={!isAdmin}
                   value={whatsappPhone}
                   onChange={(e) => setWhatsappPhone(e.target.value)}
-                  className={`w-full border text-xs rounded-xl px-3 py-2 font-mono font-bold ${
+                  className={`w-full border text-xs rounded-xl px-3 py-2.5 font-mono font-bold ${
                     isAdmin 
                       ? 'bg-slate-950 border-slate-700 text-brand-cyan focus:ring-2 focus:ring-brand-500' 
-                      : 'bg-slate-950/50 border-slate-800 text-slate-400 opacity-75 cursor-not-allowed'
+                      : 'bg-slate-950/60 border-slate-800 text-slate-400 opacity-80 cursor-not-allowed'
                   }`}
                 />
               </div>
@@ -318,15 +335,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 if (cameraStream) stopCameraStream(cameraStream);
                 onClose();
               }}
-              className="px-4 py-2 border border-slate-700 rounded-xl text-xs font-bold text-slate-300 hover:bg-slate-800 cursor-pointer"
+              className="btn-secondary px-5 py-2.5 rounded-xl text-xs cursor-pointer"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-brand-500/25 cursor-pointer font-display"
+              className="btn-primary px-7 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider cursor-pointer font-display"
             >
-              Salvar Configurações
+              SALVAR CONFIGURAÇÕES
             </button>
           </div>
         </form>

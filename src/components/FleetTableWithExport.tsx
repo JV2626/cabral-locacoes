@@ -62,7 +62,7 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
           {onOpenAddVehicle && (
             <button
               onClick={onOpenAddVehicle}
-              className="flex items-center space-x-2 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-5 py-3 rounded-2xl text-xs font-black transition-all shadow-lg shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
+              className="btn-primary flex items-center space-x-2 px-5 py-3 rounded-2xl text-xs font-black uppercase tracking-wider font-display cursor-pointer"
             >
               <CarIcon className="w-4 h-4" />
               <span>+ Cadastrar Carro</span>
@@ -71,7 +71,7 @@ export const FleetTableWithExport: React.FC<FleetTableWithExportProps> = ({
 
           <button
             onClick={() => exportFleetToCsv(filteredVehicles)}
-            className="flex items-center space-x-2 bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-700 px-5 py-3 rounded-2xl text-xs font-bold transition-all active:scale-95 cursor-pointer"
+            className="btn-secondary flex items-center space-x-2 px-5 py-3 rounded-2xl text-xs font-bold cursor-pointer"
           >
             <DownloadIcon className="w-4 h-4" />
             <span>Exportar CSV</span>

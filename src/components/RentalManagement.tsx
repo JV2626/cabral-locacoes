@@ -158,7 +158,7 @@ export const RentalManagement: React.FC<RentalManagementProps> = ({
 
         <button
           onClick={handleOpenNewRental}
-          className="flex items-center justify-center space-x-2 bg-gradient-to-r from-brand-500 to-blue-600 hover:from-brand-600 hover:to-blue-700 text-white px-5 py-3 rounded-2xl font-black text-xs transition-all shadow-lg shadow-brand-500/25 active:scale-95 cursor-pointer uppercase tracking-wider font-display"
+          className="btn-primary flex items-center justify-center space-x-2 px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-wider font-display cursor-pointer"
         >
           <KeyIcon className="w-4 h-4" />
           <span>+ Iniciar Nova Locação</span>
@@ -422,14 +422,14 @@ export const RentalManagement: React.FC<RentalManagementProps> = ({
                 <button
                   type="button"
                   onClick={() => setIsNewRentalModalOpen(false)}
-                  className="px-4 py-2 border border-slate-700 rounded-xl text-xs font-bold text-slate-300"
+                  className="btn-secondary px-5 py-2.5 rounded-xl text-xs cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={availableVehicles.length === 0}
-                  className="px-6 py-2 bg-gradient-to-r from-brand-500 to-blue-600 text-white rounded-xl text-xs font-black uppercase tracking-wider"
+                  className="btn-primary px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider disabled:opacity-50 cursor-pointer"
                 >
                   Confirmar Retirada
                 </button>

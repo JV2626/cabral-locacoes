@@ -197,25 +197,72 @@ html.light body,
   color: #1d4ed8 !important;
 }
 
-/* Info Icon Circle */
-.light .bg-slate-800 {
+/* Button Utilities & Vibrancy in Dark & Light Modes */
+.btn-primary {
+  background-color: #0066FF !important;
+  background-image: linear-gradient(135deg, #0066FF 0%, #0052D4 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px 0 rgba(0, 102, 255, 0.39) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+.btn-primary:hover {
+  background-image: linear-gradient(135deg, #2575FC 0%, #0066FF 100%) !important;
+  box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5) !important;
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0px);
+}
+
+.btn-cyan {
+  background-color: #00D2FF !important;
+  background-image: linear-gradient(135deg, #00D2FF 0%, #00B4D8 100%) !important;
+  color: #030A17 !important;
+  font-weight: 900 !important;
+  box-shadow: 0 4px 14px 0 rgba(0, 210, 255, 0.35) !important;
+  border: 1px solid rgba(0, 210, 255, 0.4) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+.btn-cyan:hover {
+  background-image: linear-gradient(135deg, #38E0FF 0%, #00D2FF 100%) !important;
+  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+  font-weight: 700 !important;
+  transition: all 0.2s ease-in-out !important;
+}
+.btn-secondary:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+  border-color: #475569 !important;
+}
+
+.light .btn-secondary {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+.light .btn-secondary:hover {
   background-color: #e2e8f0 !important;
-  color: #475569 !important;
 }
 
-/* Landing Simulator in Light Mode */
-.light .from-brand-900\/80 {
-  --tw-gradient-from: #eff6ff var(--tw-gradient-from-position) !important;
-  --tw-gradient-to: #f8fafc var(--tw-gradient-to-position) !important;
-  --tw-gradient-stops: var(--tw-gradient-from), #ffffff var(--tw-gradient-via-position), var(--tw-gradient-to) !important;
-  background-color: #ffffff !important;
-  border-color: #bfdbfe !important;
-  box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.1) !important;
+.btn-success {
+  background-color: #25D366 !important;
+  background-image: linear-gradient(135deg, #25D366 0%, #128C7E 100%) !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 4px 14px 0 rgba(37, 211, 102, 0.35) !important;
 }
-
-/* Modal Backdrops and Containers */
-.light .bg-slate-900\/95 {
-  background-color: #ffffff !important;
+.btn-success:hover {
+  background-image: linear-gradient(135deg, #2ee572 0%, #25D366 100%) !important;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5) !important;
 }
 
 
